@@ -1,5 +1,5 @@
 public interface IClient {
-  public void verbindungsFehler();
+	public void verbindungsFehler();
 	
 	public void neuerZustandChomp(Zustand zustand, boolean spielfeld[][], String gegenspieler);
 	public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein spielfeld[][], String gegenspieler);
