@@ -3,6 +3,9 @@ import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+/** 
+ * Diese Klasse implementiert IServerConnection
+ */
 public class ServerConnection implements IServerConnection {
 	private IClient client;
 	private ObjectOutputStream conn_out;
