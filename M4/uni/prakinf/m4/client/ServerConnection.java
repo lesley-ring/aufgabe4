@@ -1,25 +1,31 @@
+package uni.prakinf.m4.client;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 
 /** 
- * Diese Klasse implementiert IServerConnection
+ * Diese Klasse implementiert uni.prakinf.m4.client.IServerConnection
  */
 public class ServerConnection implements IServerConnection {
 	private IClient client;
 	private ObjectOutputStream conn_out;
 	private ObjectInputStream conn_in;
-	
-	public void setClient(IClient client) {
+
+    private IClient.Zustand letzterZustand;
+
+    public void setClient(IClient client) {
 		this.client = client;
 	}
-	
+
 	public boolean login(String server, String name, String passwort) {
 		return false;
 	}
-	
-	public boolean zug(int x, int y) {
+
+    public void antwortAufAnfrage(boolean ok) {
+
+    }
+
+    public boolean zug(int x, int y) {
 		return false;
 	}
 	
@@ -37,4 +43,12 @@ public class ServerConnection implements IServerConnection {
 	public boolean nachricht(String name, String nachricht) {
 		return false;
 	}
+
+    private enum Verbindungszustand {
+        GETRENNT,
+        VERBUNDEN,
+        ANGEMELDET,
+        SPIELT
+    }
+
 }

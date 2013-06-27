@@ -1,6 +1,8 @@
+package uni.prakinf.m4.client;
+
 public interface IServerConnection {
 	/**
-	 * An dieses IClient-Objekt werden die Statusnachrichten gesendet
+	 * An dieses uni.prakinf.m4.client.IClient-Objekt werden die Statusnachrichten gesendet
 	 */
 	public void setClient(IClient client);
 	
@@ -9,7 +11,13 @@ public interface IServerConnection {
 	 * @return True, falls der Versuch erfolgreich war. Sonst false.
 	 */
 	public boolean login(String server, String name, String passwort);
-	
+
+    /**
+     * Beantwortet eine Anfrage eines Gegenspielers.
+     * @param ok Ob die Anfrage angenommen wurde (true) oder nicht (false)
+     */
+    public void antwortAufAnfrage(boolean ok);
+
 	/**
 	 * Sendet einen Zug mit den Koordinaten x, y an den Server
 	 * @return True, falls der Zug erlaubt ist. Sonst false.
