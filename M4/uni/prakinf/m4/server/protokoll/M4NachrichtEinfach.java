@@ -13,10 +13,11 @@ public class M4NachrichtEinfach implements Serializable {
 
     /**
      * Konstruktor einer einfachen Nachricht.
-     * @param art Die Art der Nachricht
-     * @param erfolg Ob die Operation erfolgreich war (optional)
-     * @param name Der Name des beteiligten Benutzers (optional)
-     * @param passwort Das Passwort im Fall einer Anmeldung (optional)
+     *
+     * @param art       Die Art der Nachricht
+     * @param erfolg    Ob die Operation erfolgreich war (optional)
+     * @param name      Der Name des beteiligten Benutzers (optional)
+     * @param passwort  Das Passwort im Fall einer Anmeldung (optional)
      * @param nachricht Eine Nachricht als Zeichenkette (optional)
      */
     public M4NachrichtEinfach(Art art, boolean erfolg, String name, String passwort, String nachricht) {

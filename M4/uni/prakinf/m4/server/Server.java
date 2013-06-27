@@ -11,7 +11,7 @@ import java.util.Map;
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 
 public class Server { /* implements ICommWindowCallback {
-	// TODO Doppelte Anmeldungen ----- OKAY
+    // TODO Doppelte Anmeldungen ----- OKAY
 	// TODO HashMap speichern    ----- OKAY
 	// TODO Listenfeld als Liste ----- OKAY
 	// TODO Private Chats

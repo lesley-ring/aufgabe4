@@ -9,7 +9,7 @@ import java.net.SocketException;
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 
 public class MessageListenerThread extends Thread { /*
-	private Socket socket;
+    private Socket socket;
 	private Server server;
 	private CommWindow cw;
 	private boolean running;

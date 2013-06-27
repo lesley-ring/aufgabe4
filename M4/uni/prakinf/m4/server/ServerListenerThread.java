@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class ServerListenerThread extends Thread {/*
-		private Server server;
+        private Server server;
 		private boolean running;
 		private ServerSocket socket;
 		
