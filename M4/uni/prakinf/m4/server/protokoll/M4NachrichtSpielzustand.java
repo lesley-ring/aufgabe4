@@ -4,7 +4,7 @@ import uni.prakinf.m4.client.IClient;
 
 import java.io.Serializable;
 
-public class M4NachrichtSpielzustand implements Serializable {
+public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable {
     public static final long serialVersionUID = 4000000002L;
 
     private IClient.Zustand zustand;

@@ -9,23 +9,28 @@ import java.util.List;
 import java.util.Map;
 
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
+import uni.prakinf.m4.server.protokoll.M4TransportThread;
 
-public class Server { /* implements ICommWindowCallback {
-    // TODO Doppelte Anmeldungen ----- OKAY
-	// TODO HashMap speichern    ----- OKAY
-	// TODO Listenfeld als Liste ----- OKAY
-	// TODO Private Chats
+public class Server {
+    private List<M4TransportThread> clients;
+
+    public Server() {
+
+    }
+
+/* implements ICommWindowCallback {
+
 	public static final int DEFAULT_PORT = 4444;
 	public static final String DEFAULT_CHANNEL_LIST_DELIMITER = "%";
 
 	private ServerListenerThread listener;
-	private List<MessageListenerThread> clients;
+	private List<M4TransportThread> clients;
 	private Map<String, String> logins;
 	private ServerCommWindow cw;
 	private boolean running;
 
 	public Server() {
-		clients = new LinkedList<MessageListenerThread>();
+		clients = new LinkedList<M4TransportThread>();
 		logins = new HashMap<String, String>();
 		running = false;
 	}
@@ -61,7 +66,7 @@ public class Server { /* implements ICommWindowCallback {
 	public void stopServer() throws InterruptedException, IOException {
 		cw.displayLine("Halte Server an...");
 		listener.stopListening();
-		for (MessageListenerThread client : clients) {
+		for (M4TransportThread client : clients) {
 			client.stopCommunication();
 		}
 		clients.clear();
@@ -70,7 +75,7 @@ public class Server { /* implements ICommWindowCallback {
 
 	public void clientConnected(Socket socket) {
 		try {
-			MessageListenerThread client = new MessageListenerThread(this,
+			M4TransportThread client = new M4TransportThread(this,
 					socket, cw);
 			client.startCommunication();
 			synchronized (clients) {
@@ -87,21 +92,21 @@ public class Server { /* implements ICommWindowCallback {
 			cw.displayLine(String.format("[%-12s] %s", message.getParamA(),
 					message.getParamB()));
 		synchronized (clients) {
-			for (MessageListenerThread client : clients)
+			for (M4TransportThread client : clients)
 				client.sendMessage(message);
 		}
 	}
 	
-	public void relayMessage(M4NachrichtEinfach message, MessageListenerThread source) {
+	public void relayMessage(M4NachrichtEinfach message, M4TransportThread source) {
 		synchronized (clients) {
-			for (MessageListenerThread client : clients) {
+			for (M4TransportThread client : clients) {
 				if(client.getClientName().equals(message.getParamB()) || client.getClientName().equals(source.getClientName()))
 					client.sendMessage(new M4NachrichtEinfach(MessageType.MESSAGE_BROADCAST, source.getClientName(), message.getParamA()));
 			}
 		}
 	}
 
-	public void clientDisconnected(MessageListenerThread client) {
+	public void clientDisconnected(M4TransportThread client) {
 		if (client.isLoggedIn())
 			cw.displayLine(String.format("%s hat sich abgemeldet",
 					client.getClientName()));
@@ -118,7 +123,7 @@ public class Server { /* implements ICommWindowCallback {
 		login_valid = PasswordManager.validateLogin(name, password);
 
 		// Ist der Client bereits eingeloggt?
-		for (MessageListenerThread client : clients) {
+		for (M4TransportThread client : clients) {
 			if (client.isLoggedIn() && client.getClientName().equals(name))
 				login_valid = false;
 		}
@@ -135,7 +140,7 @@ public class Server { /* implements ICommWindowCallback {
 		public void run() {
 			String channel_list = "";
 			synchronized (clients) {
-				for (MessageListenerThread client : clients) {
+				for (M4TransportThread client : clients) {
 					if (client.isLoggedIn()) {
 						if (!channel_list.isEmpty())
 							channel_list += DEFAULT_CHANNEL_LIST_DELIMITER;
@@ -150,7 +155,7 @@ public class Server { /* implements ICommWindowCallback {
 					MessageType.CHANNEL_LIST, channel_list,
 					DEFAULT_CHANNEL_LIST_DELIMITER);
 			synchronized (clients) {
-				for (MessageListenerThread client : clients) {
+				for (M4TransportThread client : clients) {
 					client.sendMessage(message);
 				}
 			}
