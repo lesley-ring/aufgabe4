@@ -62,17 +62,17 @@ public class ServerConnection implements IServerConnection, M4NachrichtenAnnahme
 
 
     @Override
-    public void verarbeiteNachricht(M4NachrichtEinfach nachrichtEinfach) {
+    public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
 
     }
 
     @Override
-    public void verarbeiteNachricht(M4NachrichtSpielzustand spielzustand) {
+    public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
 
     }
 
     @Override
-    public void verbindungsFehler(Exception exception) {
+    public void verbindungsFehler(Object userObject, Exception exception) {
 
     }
 
