@@ -15,7 +15,7 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
     private IClient.VierGewinntStein spielfeldVierGewinnt[][];
 
     /**
-     * Konstruktor fuer Chomp-Spielzustand
+     * Konstruktor fuer uni.prakinf.m4.client.Chomp-Spielzustand
      *
      * @param zustand   Spielzustand
      * @param spielfeld Spielfeld

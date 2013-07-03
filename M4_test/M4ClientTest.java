@@ -20,7 +20,7 @@ public class M4ClientTest implements IClient {
 
     @Override
     public void neuerZustandChomp(Zustand zustand, boolean[][] spielfeld, String gegenspieler) {
-        System.out.println("M4ClientTest: Neuer Chomp-Zustand!");
+        System.out.println("M4ClientTest: Neuer uni.prakinf.m4.client.Chomp-Zustand!");
     }
 
     @Override
@@ -30,7 +30,7 @@ public class M4ClientTest implements IClient {
 
     @Override
     public void spielerListe(String[] name, Spiel[] spiel) {
-        System.out.println("M4ClientTest: Spieler: ");
+        System.out.println("M4ClientTest: uni.prakinf.m4.client.Spieler: ");
         for(String sname : name)
             System.out.println("M4ClientTest: " + name);
     }

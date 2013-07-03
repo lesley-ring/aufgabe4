@@ -47,7 +47,7 @@ public interface IServerConnection {
     public boolean mitspielen(String name, IClient.Spiel spiel);
 
     /**
-     * Sendet eine Nachricht "nachricht" an den Spieler "name".
+     * Sendet eine Nachricht "nachricht" an den uni.prakinf.m4.client.Spieler "name".
      *
      * @return True, falls die Nachricht zugestellt wurde. Sonst false.
      */
