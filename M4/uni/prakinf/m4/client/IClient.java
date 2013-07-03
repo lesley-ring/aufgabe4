@@ -3,7 +3,7 @@ package uni.prakinf.m4.client;
 public interface IClient {
     public void verbindungsFehler();
 
-    public void neuerZustandChomp(Zustand zustand, boolean spielfeld[][], String gegenspieler);
+    public void neuerZustandChomp(Zustand zustand, int x, int y, String gegenspieler);  // Ich habe die methode geändert.
 
     public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein spielfeld[][], String gegenspieler);
 
