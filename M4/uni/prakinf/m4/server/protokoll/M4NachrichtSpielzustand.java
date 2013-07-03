@@ -16,10 +16,11 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
 
     /**
      * Konstruktor fuer Chomp-Spielzustand
-     * @param zustand Spielzustand
+     *
+     * @param zustand   Spielzustand
      * @param spielfeld Spielfeld
      */
-    public M4NachrichtSpielzustand (IClient.Zustand zustand, boolean spielfeld[][]) {
+    public M4NachrichtSpielzustand(IClient.Zustand zustand, boolean spielfeld[][]) {
         this.zustand = zustand;
         this.spiel = IClient.Spiel.CHOMP;
         this.spielfeldChomp = spielfeld;
@@ -29,10 +30,11 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
 
     /**
      * Konstruktor fuer Vier Gewinnt-Spielzustand
-     * @param zustand Spielzustand
+     *
+     * @param zustand   Spielzustand
      * @param spielfeld Spielfeld
      */
-    public M4NachrichtSpielzustand (IClient.Zustand zustand, IClient.VierGewinntStein spielfeld[][]) {
+    public M4NachrichtSpielzustand(IClient.Zustand zustand, IClient.VierGewinntStein spielfeld[][]) {
         this.zustand = zustand;
         this.spiel = IClient.Spiel.VIER_GEWINNT;
         this.spielfeldVierGewinnt = spielfeld;
@@ -42,10 +44,11 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
 
     /**
      * Konstruktor fuer Zustand ohne Spielfeld
+     *
      * @param zustand
      * @param spiel
      */
-    public M4NachrichtSpielzustand (IClient.Zustand zustand, IClient.Spiel spiel) {
+    public M4NachrichtSpielzustand(IClient.Zustand zustand, IClient.Spiel spiel) {
         this.zustand = zustand;
         this.spiel = spiel;
         this.spielfeldGueltig = false;

@@ -1,15 +1,8 @@
 package uni.prakinf.m4.server;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 import uni.prakinf.m4.server.protokoll.M4TransportThread;
+
+import java.util.List;
 
 public class Server {
     private List<M4TransportThread> clients;

@@ -8,25 +8,31 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class M4TransportThread extends Thread {
     public final static int M4PORT = 39291;
     public final static int M4CAP = 25;
     public final static int M4TIMEOUT = 100;
+    public final static int M4BLOCKTIME = 5000;
     // Bei Konstruktion
     private Socket socket;
-    private M4NachrichtenAnnahme annahme;
+    private M4Annahme annahme;
     private Object userObject;
     // Zur Laufzeit
-    private BlockingQueue<M4Nachricht> nachrichten;
-    private boolean bRun;
+    private BlockingQueue<M4Nachricht> nachrichtenAusgehend;
+    private BlockingQueue<M4Nachricht> nachrichtenEingehend;
+    private boolean threadSollLaufen;
+    private boolean nachrichtenEinreihen;
 
-    private M4TransportThread(M4NachrichtenAnnahme annahme, Object userObject) {
+    private M4TransportThread(M4Annahme annahme, Object userObject) {
         this.annahme = annahme;
         this.userObject = userObject;
 
-        nachrichten = new ArrayBlockingQueue<M4Nachricht>(M4CAP, true);
-        bRun = false;
+        nachrichtenAusgehend = new ArrayBlockingQueue<M4Nachricht>(M4CAP, true);
+        nachrichtenEingehend = new ArrayBlockingQueue<M4Nachricht>(M4CAP, true);
+        threadSollLaufen = false;
+        nachrichtenEinreihen = false;
     }
 
     /**
@@ -36,7 +42,7 @@ public class M4TransportThread extends Thread {
      * @param hostname   Der Hostname des Servers
      * @param userObject Tag
      */
-    public M4TransportThread(M4NachrichtenAnnahme annahme, Object userObject, String hostname) {
+    public M4TransportThread(M4Annahme annahme, Object userObject, String hostname) {
         this(annahme, userObject);
 
         try {
@@ -54,7 +60,7 @@ public class M4TransportThread extends Thread {
      * @param annahme Das Nachrichtenannahmeinterface
      * @param socket  Der Socket der Verbindung
      */
-    public M4TransportThread(M4NachrichtenAnnahme annahme, Object userObject, Socket socket) {
+    public M4TransportThread(M4Annahme annahme, Object userObject, Socket socket) {
         this(annahme, userObject);
         this.socket = socket;
 
@@ -77,29 +83,37 @@ public class M4TransportThread extends Thread {
             return;
         }
 
-        bRun = true;
+        threadSollLaufen = true;
 
-        while (bRun) {
+        while (threadSollLaufen) {
             try {
                 if (i.available() > 0) {
-                    M4Nachricht nachricht = (M4Nachricht) i.readObject();
+                    final M4Nachricht nachricht = (M4Nachricht) i.readObject();
                     if (nachricht == null)
                         continue;
-
-                    if (nachricht instanceof M4NachrichtEinfach) {
-                        annahme.verarbeiteNachricht(userObject, (M4NachrichtEinfach) nachricht);
-                    } else if (nachricht instanceof M4NachrichtSpielzustand) {
-                        annahme.verarbeiteNachricht(userObject, (M4NachrichtSpielzustand) nachricht);
+                    synchronized (this) {
+                        if (nachrichtenEinreihen) {
+                            nachrichtenEingehend.put(nachricht);
+                        } else new Thread() {
+                            @Override
+                            public void run() {
+                                if (nachricht instanceof M4NachrichtEinfach) {
+                                    annahme.verarbeiteNachricht(userObject, (M4NachrichtEinfach) nachricht);
+                                } else if (nachricht instanceof M4NachrichtSpielzustand) {
+                                    annahme.verarbeiteNachricht(userObject, (M4NachrichtSpielzustand) nachricht);
+                                }
+                            }
+                        }.start();
                     }
                 }
-                if(nachrichten.peek() != null) {
-                    o.writeObject(nachrichten.take());
+                if (nachrichtenAusgehend.peek() != null) {
+                    o.writeObject(nachrichtenAusgehend.take());
                 }
             } catch (SocketTimeoutException stx) {
                 // Nichts tun!
             } catch (Exception e) {
                 annahme.verbindungsFehler(userObject, e);
-                bRun = false;
+                threadSollLaufen = false;
             }
         }
 
@@ -111,7 +125,7 @@ public class M4TransportThread extends Thread {
     }
 
     public void abbruch() {
-        bRun = false;
+        threadSollLaufen = false;
         try {
             join();
         } catch (InterruptedException iex) {
@@ -119,11 +133,23 @@ public class M4TransportThread extends Thread {
         }
     }
 
-    public void sendeNachricht(M4Nachricht nachricht) {
+    public void sendeNachrichtAsync(M4Nachricht nachricht) {
         try {
-            nachrichten.add(nachricht);
+            nachrichtenAusgehend.add(nachricht);
         } catch (Exception e) {
             annahme.verbindungsFehler(userObject, e);
+        }
+    }
+
+    public synchronized M4Nachricht warteAufNachricht() {
+        nachrichtenEinreihen = true;
+        try {
+            M4Nachricht nachricht = nachrichtenEingehend.poll(M4BLOCKTIME, TimeUnit.MILLISECONDS);
+            nachrichtenEinreihen = false;
+            return nachricht;
+        } catch (Exception e) {
+            nachrichtenEinreihen = false;
+            return null;
         }
     }
 
