@@ -86,6 +86,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
 
+        // HAllo
     }
 
     @Override
@@ -109,7 +110,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
             case SPIELT:
             case ANGEMELDET:
             case VERBUNDEN:
-                if(thread != null)
+                if (thread != null)
                     thread.abbruch();
         }
     }
