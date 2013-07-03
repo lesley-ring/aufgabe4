@@ -53,4 +53,9 @@ public interface IServerConnection {
      */
     public boolean nachricht(String name, String nachricht);
 
+    /**
+     * Trennt die Verbindung zum Server
+     */
+    public void verbindungTrennen();
+
 }

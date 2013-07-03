@@ -1,5 +1,6 @@
 package uni.prakinf.m4.server.protokoll;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -76,8 +77,10 @@ public class M4TransportThread extends Thread {
         ObjectInputStream i;
         ObjectOutputStream o;
         try {
+            socket.setSoTimeout(M4TIMEOUT * 100);
             o = new ObjectOutputStream(socket.getOutputStream());
             i = new ObjectInputStream(socket.getInputStream());
+            socket.setSoTimeout(M4TIMEOUT);
         } catch (IOException ioex) {
             annahme.verbindungsFehler(userObject, ioex);
             return;
@@ -87,10 +90,12 @@ public class M4TransportThread extends Thread {
 
         while (threadSollLaufen) {
             try {
-                if (i.available() > 0) {
-                    final M4Nachricht nachricht = (M4Nachricht) i.readObject();
-                    if (nachricht == null)
-                        continue;
+                if (nachrichtenAusgehend.peek() != null) {
+                    System.out.printf("Sende Nachricht\n");
+                    o.writeObject(nachrichtenAusgehend.take());
+                }
+                final M4Nachricht nachricht = (M4Nachricht) i.readObject();
+                if (nachricht != null) {
                     synchronized (this) {
                         if (nachrichtenEinreihen) {
                             nachrichtenEingehend.put(nachricht);
@@ -106,10 +111,9 @@ public class M4TransportThread extends Thread {
                         }.start();
                     }
                 }
-                if (nachrichtenAusgehend.peek() != null) {
-                    o.writeObject(nachrichtenAusgehend.take());
-                }
             } catch (SocketTimeoutException stx) {
+                // Nichts tun!
+            } catch (EOFException eofx) {
                 // Nichts tun!
             } catch (Exception e) {
                 annahme.verbindungsFehler(userObject, e);
@@ -141,14 +145,20 @@ public class M4TransportThread extends Thread {
         }
     }
 
-    public synchronized M4Nachricht warteAufNachricht() {
+    public M4Nachricht warteAufNachricht() {
+        synchronized(this) {
         nachrichtenEinreihen = true;
+        }
         try {
             M4Nachricht nachricht = nachrichtenEingehend.poll(M4BLOCKTIME, TimeUnit.MILLISECONDS);
-            nachrichtenEinreihen = false;
+            synchronized (this) {
+                nachrichtenEinreihen = false;
+            }
             return nachricht;
         } catch (Exception e) {
-            nachrichtenEinreihen = false;
+            synchronized (this) {
+                nachrichtenEinreihen = false;
+            }
             return null;
         }
     }

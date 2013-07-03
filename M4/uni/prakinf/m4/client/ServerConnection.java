@@ -25,15 +25,22 @@ public class ServerConnection implements IServerConnection, M4Annahme {
 
     public boolean login(String server, String name, String passwort) {
         // Verbindung aufbauen
-        thread = new M4TransportThread(this, null, server);
-        thread.start();
-        verbindungszustand = Verbindungszustand.VERBUNDEN;
+        if (verbindungszustand == Verbindungszustand.ANGEMELDET || verbindungszustand == Verbindungszustand.SPIELT)
+            return false;
+        if (verbindungszustand == Verbindungszustand.GETRENNT) {
+            System.out.println("ServerConnection: Erstelle Thread...");
+            thread = new M4TransportThread(this, null, server);
+            thread.start();
+            verbindungszustand = Verbindungszustand.VERBUNDEN;
+        }
 
         // Anmeldung
+        System.out.println("ServerConnection: Anmeldung...");
         M4NachrichtEinfach login_nr = new M4NachrichtEinfach(M4NachrichtEinfach.Art.CS_LOGIN, false, name, passwort, null);
         thread.sendeNachrichtAsync(login_nr);
 
         // Antwort abwarten
+        System.out.println("ServerConnection: Antwort abwarten...");
         M4Nachricht antwort = thread.warteAufNachricht();
         if (antwort instanceof M4NachrichtEinfach) {
             M4NachrichtEinfach antwort_e = (M4NachrichtEinfach) antwort;
@@ -90,7 +97,20 @@ public class ServerConnection implements IServerConnection, M4Annahme {
                 break;
             case GETRENNT:
             case VERBUNDEN:
+                System.out.printf("ServerConnection: Verbindungsfehler (%s)\n", exception.getMessage());
                 break;
+        }
+        verbindungszustand = Verbindungszustand.GETRENNT;
+    }
+
+    @Override
+    public void verbindungTrennen() {
+        switch (verbindungszustand) {
+            case SPIELT:
+            case ANGEMELDET:
+            case VERBUNDEN:
+                if(thread != null)
+                    thread.abbruch();
         }
     }
 
