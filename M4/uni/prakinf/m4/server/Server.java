@@ -16,22 +16,24 @@ public class Server implements M4Annahme {
     private List<M4TransportThread> threads;
     private List<Sitzung> sitzungen;
 
-    private boolean bWeiter;
+    private VerbindungsThread vthread;
+
 
     public Server() {
         threads = new LinkedList<M4TransportThread>();
         sitzungen = new LinkedList<Sitzung>();
-        bWeiter = false;
     }
 
     public void startServer() {
-
+        vthread = new VerbindungsThread(this);
+        vthread.start();
     }
 
     public void stopServer() {
 
     }
 
+    // Verbindungsannahme
     private class VerbindungsThread extends Thread {
         private Server server;
         private boolean weiterlaufen;
@@ -53,7 +55,15 @@ public class Server implements M4Annahme {
 
             while (weiterlaufen) {
                 try {
-                    socket.accept();
+                    Socket s = socket.accept();
+                    M4TransportThread transportThread = new M4TransportThread(server, null, s);
+                    Sitzung sitzung = new Sitzung(server, transportThread);
+                    transportThread.setUserObject(sitzung);
+
+                    server.sitzungen.add(sitzung);
+                    server.threads.add(transportThread);
+
+                    transportThread.start();
                 } catch (SocketTimeoutException stex) {
                     // Nichts tun!
                 } catch (Exception e) {
@@ -93,12 +103,19 @@ public class Server implements M4Annahme {
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
-        // Sollte nie aufgerufen werden!
+        // Sollte nie aufgerufen werden, da diese Nachrichten vom Client kommen!
+        System.err.printf("Server: Fehlerhafte Nachricht vom Client (Spielzustand), ignoriert\n");
     }
 
     @Override
     public void verbindungsFehler(Object userObject, Exception exception) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (userObject instanceof Sitzung) {
+            Sitzung sitzung = (Sitzung) userObject;
+            System.err.printf("Server: Ausnahme in Transportthread: %s\n", exception.getMessage());
+            // TODO Sitzung benachrichtigen
+        } else {
+            System.err.println("Server: Fehlerhaftes userObject vom Transportthread!");
+        }
     }
 
 

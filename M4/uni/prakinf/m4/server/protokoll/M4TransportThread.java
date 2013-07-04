@@ -19,8 +19,9 @@ public class M4TransportThread extends Thread {
     // Bei Konstruktion
     private Socket socket;
     private M4Annahme annahme;
-    private Object userObject;
+
     // Zur Laufzeit
+    private Object userObject;
     private BlockingQueue<M4Nachricht> nachrichtenAusgehend;
     private BlockingQueue<M4NachrichtEinfach> nachrichtenEingehend;
     private boolean threadSollLaufen;
@@ -164,6 +165,10 @@ public class M4TransportThread extends Thread {
             }
             return null;
         }
+    }
+
+    public void setUserObject(Object userObject) {
+        this.userObject = userObject;
     }
 
     /*
