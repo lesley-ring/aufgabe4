@@ -1,9 +1,6 @@
 package uni.prakinf.m4.server;
 
-import uni.prakinf.m4.server.protokoll.M4Annahme;
-import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
-import uni.prakinf.m4.server.protokoll.M4NachrichtSpielzustand;
-import uni.prakinf.m4.server.protokoll.M4TransportThread;
+import uni.prakinf.m4.server.protokoll.*;
 import uni.prakinf.m4.server.sitzung.Sitzung;
 
 import java.net.ServerSocket;
@@ -82,24 +79,12 @@ public class Server implements M4Annahme {
     // M4Annahme Methoden
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
-        if (userObject instanceof Sitzung) {
-            Sitzung sitzung = (Sitzung) userObject;
-            switch (nachrichtEinfach.getMethode()) {
-                case CL_LOGIN:
-                    sitzung.login("", nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
-                    break;
-                case RET_CL_LOGIN:
-                case RET_CL_MITSPIELEN:
-                case RET_CL_NACHRICHT:
-                case RET_CL_NEUESSPIEL:
-                case RET_CL_ZUG:
-                    System.err.println("Server: Fehlerhafte Nachricht vom Client, ignoriert.");
-                    break;
-            }
-        } else {
+        if (userObject instanceof Sitzung)
+            M4DecoderClientToServer.decodiereNachricht((Sitzung) userObject, nachrichtEinfach);
+        else
             System.err.println("Server: Fehlerhaftes userObject vom Transportthread!");
-        }
     }
+
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {

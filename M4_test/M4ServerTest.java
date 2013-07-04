@@ -45,7 +45,6 @@ public class M4ServerTest implements M4Annahme {
         if (nachrichtEinfach.getMethode() == M4NachrichtEinfach.Methode.CL_LOGIN) {
             M4NachrichtEinfach antwort = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.RET_CL_LOGIN);
             antwort.setB(true);
-            thread.sendeNachrichtAsync(antwort);
         }
 
     }

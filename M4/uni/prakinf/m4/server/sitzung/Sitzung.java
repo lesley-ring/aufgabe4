@@ -2,7 +2,9 @@ package uni.prakinf.m4.server.sitzung;
 
 import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.client.IServerConnection;
+import uni.prakinf.m4.server.PasswortVerwaltung;
 import uni.prakinf.m4.server.Server;
+import uni.prakinf.m4.server.protokoll.M4Nachricht;
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 import uni.prakinf.m4.server.protokoll.M4NachrichtSpielzustand;
 import uni.prakinf.m4.server.protokoll.M4TransportThread;
@@ -21,12 +23,25 @@ public class Sitzung implements IClient, IServerConnection {
         sitzungszustand = Sitzungszustand.VERBUNDEN;
     }
 
+    public M4TransportThread getThread() {
+        return thread;
+    }
+
+    public void sendeNachrichtAsync(M4Nachricht nachricht) {
+        if (thread != null)
+            thread.sendeNachrichtAsync(nachricht);
+    }
+
     // IServerConnection Methoden - Aufruf von außen durch Decoder im Server!
     @Override
     public boolean login(String server, String name, String passwort) {
         if (sitzungszustand == Sitzungszustand.VERBUNDEN) {
-
-        }
+            boolean result = PasswortVerwaltung.passwortGueltig(name, passwort);
+            if (result)
+                sitzungszustand = Sitzungszustand.ANGEMELDET;
+            return result;
+        } else
+            return false;
     }
 
     @Override
