@@ -6,10 +6,12 @@ public class M4ClientTest implements IClient {
     public void los() {
         IServerConnection conn = new ServerConnection();
         System.out.println("M4ClientTest: Anmeldung...");
-        if(!conn.login("localhost", "Clemens", "test")) {
+        if (!conn.login("localhost", "Clemens", "test")) {
             System.out.println("M4ClientTest: Fehler!");
         }
+        System.out.println("M4ClientTest: Login okay!");
         conn.verbindungTrennen();
+        System.exit(0);
     }
 
 
@@ -31,7 +33,7 @@ public class M4ClientTest implements IClient {
     @Override
     public void spielerListe(String[] name, Spiel[] spiel) {
         System.out.println("M4ClientTest: uni.prakinf.m4.client.Spieler: ");
-        for(String sname : name)
+        for (String sname : name)
             System.out.println("M4ClientTest: " + name);
     }
 

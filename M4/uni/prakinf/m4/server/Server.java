@@ -1,15 +1,48 @@
 package uni.prakinf.m4.server;
 
+import uni.prakinf.m4.server.protokoll.M4Annahme;
+import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
+import uni.prakinf.m4.server.protokoll.M4NachrichtSpielzustand;
 import uni.prakinf.m4.server.protokoll.M4TransportThread;
+import uni.prakinf.m4.server.sitzung.Sitzung;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class Server {
-    private List<M4TransportThread> clients;
+public class Server implements M4Annahme {
+    private List<M4TransportThread> threads;
+    private List<Sitzung> sitzungen;
 
     public Server() {
+        threads = new LinkedList<M4TransportThread>();
+        sitzungen = new LinkedList<Sitzung>();
+    }
+
+    public void start() {
 
     }
+
+    public void stop() {
+
+    }
+
+    // M4Annahme Methode
+
+    @Override
+    public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void verbindungsFehler(Object userObject, Exception exception) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
 /* implements ICommWindowCallback {
 
