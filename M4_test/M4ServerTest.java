@@ -41,9 +41,12 @@ public class M4ServerTest implements M4Annahme {
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
-        System.out.printf("M4ServerTest: Nachricht (einfach). Art: %s \n", nachrichtEinfach.getArt().toString());
-        if(nachrichtEinfach.getArt() == M4NachrichtEinfach.Art.CS_LOGIN)
-            thread.sendeNachrichtAsync(new M4NachrichtEinfach(M4NachrichtEinfach.Art.SC_LOGIN, true, null, null, null));
+        System.out.printf("M4ServerTest: Nachricht (einfach). Methode: %s \n", nachrichtEinfach.getMethode().toString());
+        if (nachrichtEinfach.getMethode() == M4NachrichtEinfach.Methode.CL_LOGIN) {
+            M4NachrichtEinfach antwort = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.RET_CL_LOGIN);
+            antwort.setB(true);
+            thread.sendeNachrichtAsync(antwort);
+        }
 
     }
 

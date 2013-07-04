@@ -7,11 +7,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 
-public class Spiele implements IClient,ActionListener {
+public class Spiele implements IClient, ActionListener {
     private String[] names;
     private Spiel[] spiels;
     private MenuItem[] menuItems;
-    private int m,n;
+    private int m, n;
     private String name;    //Frage: Sollt eigener Name auch von Server bekommen?
     private Spiel spiel;
     private Zustand zustand;
@@ -19,6 +19,7 @@ public class Spiele implements IClient,ActionListener {
     //private VierGewinnt vierGewinnt;
     ServerConnection serverConnection;
     Frame frame = new Frame("Spiel");
+
     public Spiele() {
         serverConnection = new ServerConnection();
         serverConnection.setClient(this);
@@ -42,13 +43,20 @@ public class Spiele implements IClient,ActionListener {
     }
 
     private void spielen() {
-        if(spiel==Spiel.CHOMP){
-            if(chomp.zustand == 1){
+        if (spiel == Spiel.CHOMP) {
+            /*
+                Die Methode neuerZustandChomp wird von außen aufgerufen, du darfst sie selbst nicht aufrufen!
+             */
+
+
+            /*if(chomp.zustand == 1){
                 neuerZustandChomp(Zustand.ZUG,chomp.x,chomp.y,chomp.gegenspieler.name);
             }
             if(chomp.zustand == 2){
                 // Koordinaten gx, gy sollen von Server bekommen.
-                chomp.gegenspielerspielen(gx,gy);
+                // chomp.gegenspielerspielen(gx,gy);
+
+
                 neuerZustandChomp(Zustand.WARTEN,chomp.x,chomp.y,chomp.gegenspieler.name);
             }
             if(chomp.zustand == 3){
@@ -59,7 +67,7 @@ public class Spiele implements IClient,ActionListener {
             }
             if(chomp.zustand == 5){
                 neuerZustandChomp(Zustand.ABBRUCH,chomp.x,chomp.y,chomp.gegenspieler.name);
-            }
+            } */
         }
     }
 
@@ -69,29 +77,29 @@ public class Spiele implements IClient,ActionListener {
     }
 
     @Override
-    public void neuerZustandChomp(Zustand zustand, int x, int y, String gegenspieler) {
+    public void neuerZustandChomp(Zustand zustand, boolean spielfeld[][], String gegenspieler) {
         zustand = this.zustand;
-        if(zustand == Zustand.ZUG){
+        if (zustand == Zustand.ZUG) {
             // Die Koordinaten x, y sollen durch Server zum Gegenspieler liefern.
             zustand = Zustand.WARTEN;
             chomp.zustand = 2;
         }
-        if(zustand == Zustand.WARTEN){
+        if (zustand == Zustand.WARTEN) {
             zustand = Zustand.ZUG;
             chomp.zustand = 1;
         }
-        if(zustand == Zustand.GEWONNEN){
+        if (zustand == Zustand.GEWONNEN) {
             // Die Koordinaten x, y sollen durch Server zum Gegenspieler liefern.
-            nachricht(name,"hat gewonnen!");
+            nachricht(name, "hat gewonnen!");
             chomp.zustand = 0;
         }
-        if(zustand == Zustand.VERLOREN){
+        if (zustand == Zustand.VERLOREN) {
             // Die Koordinaten x, y sollen durch Server zum Gegenspieler liefern.
-            nachricht(name,"hat verloren!");
+            nachricht(name, "hat verloren!");
             chomp.zustand = 0;
         }
-        if(zustand == Zustand.ABBRUCH){
-            nachricht(name,"hat abgebrochen!");
+        if (zustand == Zustand.ABBRUCH) {
+            nachricht(name, "hat abgebrochen!");
         }
     }
 
@@ -104,10 +112,10 @@ public class Spiele implements IClient,ActionListener {
     public void spielerListe(String[] name, Spiel[] spiel) {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("SpielerListe");
-        for (int i = 0;i<name.length;i++){
-            if(spiel[i]==Spiel.CHOMP) menuItems[i]=new MenuItem(name[i]+", Chomp");
-            if(spiel[i]==Spiel.VIER_GEWINNT) menuItems[i]=new MenuItem(name[i]+", VierGewinnt");
-            if(spiel[i]==Spiel.KEINS) menuItems[i]=new MenuItem(name[i]+", Keins");
+        for (int i = 0; i < name.length; i++) {
+            if (spiel[i] == Spiel.CHOMP) menuItems[i] = new MenuItem(name[i] + ", Chomp");
+            if (spiel[i] == Spiel.VIER_GEWINNT) menuItems[i] = new MenuItem(name[i] + ", VierGewinnt");
+            if (spiel[i] == Spiel.KEINS) menuItems[i] = new MenuItem(name[i] + ", Keins");
             menu.add(menuItems[i]);
             menuItems[i].addActionListener(this);
         }
@@ -121,11 +129,11 @@ public class Spiele implements IClient,ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        for (int i = 0;i<names.length;i++){
-            if(e.getSource()==menuItems[i]){
-                if(serverConnection.mitspielen(names[i],spiels[i])){
-                    if(spiels[i]==Spiel.CHOMP){
-                        if(serverConnection.neuesSpiel(Spiel.CHOMP,m,n)){  //Frage: Woher kommen die Parameter m,n?
+        for (int i = 0; i < names.length; i++) {
+            if (e.getSource() == menuItems[i]) {
+                if (serverConnection.mitspielen(names[i], spiels[i])) {
+                    if (spiels[i] == Spiel.CHOMP) {
+                        if (serverConnection.neuesSpiel(Spiel.CHOMP, m, n)) {  //Frage: Woher kommen die Parameter m,n?
                             spiel = Spiel.CHOMP;
                             chomp = new Chomp();
                             chomp.m = m;

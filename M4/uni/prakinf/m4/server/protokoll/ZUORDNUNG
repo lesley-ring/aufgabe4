@@ -1,0 +1,26 @@
+IServerConnection
+-----------------
+    public boolean (b) login([...], String name (sa), String passwort (sb));
+    public boolean (b) neuesSpiel(IClient.Spiel spiel, int x (ia), int y (ib));
+    public boolean (b) zug(int x (ia), int y (ib));
+    public boolean (b) mitspielen(String name (sa), IClient.Spiel spiel (spiel));
+    public boolean (b) nachricht(String name (sa), String nachricht(sb));
+
+    public void antwortAufAnfrage(boolean ok (b));
+    public void abbrechen();
+
+IClient
+-------
+    | public void neuerZustandChomp(Zustand zustand, boolean spielfeld[][], String gegenspieler);
+    | public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein spielfeld[][], String gegenspieler);
+    public void spielerListe(String[] name (ls), Spiel[] spiel (lspiel));
+    public void nachricht(String name (sa), String nachricht (sb));
+
+Parameter
+---------
+    2 String            sa, sb
+    2 Integer           ia, ib
+    1 IClient.Spiel     spiel
+    1 Boolean           b
+    1 String-Array      ls[]
+    1 Spiel-Array       lspiel[]

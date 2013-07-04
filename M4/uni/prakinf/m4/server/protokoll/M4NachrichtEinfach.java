@@ -1,61 +1,124 @@
 package uni.prakinf.m4.server.protokoll;
 
+import uni.prakinf.m4.client.IClient;
+
 import java.io.Serializable;
 
 public class M4NachrichtEinfach extends M4Nachricht implements Serializable {
     public static final long serialVersionUID = 4000000001L;
 
-    private boolean erfolg;
-    private String name;
-    private String passwort;
-    private String nachricht;
-    private Art art;
+    private String sa = null, sb = null;
+    private int ia = 0, ib = 0;
+    private IClient.Spiel spiel = IClient.Spiel.KEINS;
+    private boolean b = false;
+    private String ls[] = null;
+    private IClient.Spiel lspiel[] = null;
+    private Methode methode = Methode.NOT_SET;
 
-    /**
-     * Konstruktor einer einfachen Nachricht.
-     *
-     * @param art       Die Art der Nachricht
-     * @param erfolg    Ob die Operation erfolgreich war (optional)
-     * @param name      Der Name des beteiligten Benutzers (optional)
-     * @param passwort  Das Passwort im Fall einer Anmeldung (optional)
-     * @param nachricht Eine Nachricht als Zeichenkette (optional)
-     */
-    public M4NachrichtEinfach(Art art, boolean erfolg, String name, String passwort, String nachricht) {
-        this.erfolg = erfolg;
-        this.name = name;
-        this.passwort = passwort;
-        this.nachricht = nachricht;
-        this.art = art;
+    public M4NachrichtEinfach(Methode methode) {
+        this.methode = methode;
     }
 
-    public boolean isErfolg() {
-        return erfolg;
+    public M4NachrichtEinfach(Methode methode, String sa, String sb, int ia, int ib, IClient.Spiel spiel, boolean b, String[] ls, IClient.Spiel[] lspiel) {
+        this.methode = methode;
+        this.sa = sa;
+        this.sb = sb;
+        this.ia = ia;
+        this.ib = ib;
+        this.spiel = spiel;
+        this.b = b;
+        this.ls = ls;
+        this.lspiel = lspiel;
     }
 
-    public String getName() {
-        return name;
+    public String getSa() {
+        return sa;
     }
 
-    public String getPasswort() {
-        return passwort;
+    public void setSa(String sa) {
+        this.sa = sa;
     }
 
-    public String getNachricht() {
-        return nachricht;
+    public String getSb() {
+        return sb;
     }
 
-    public Art getArt() {
-        return art;
+    public void setSb(String sb) {
+        this.sb = sb;
     }
 
-    public enum Art {
-        // Client -> Server
-        CS_LOGIN,
-        CS_LEAVE_GAME,
+    public int getIa() {
+        return ia;
+    }
 
-        // Server <- Client
-        SC_LOGIN,
-        SC_LEAVE_GAME
+    public void setIa(int ia) {
+        this.ia = ia;
+    }
+
+    public int getIb() {
+        return ib;
+    }
+
+    public void setIb(int ib) {
+        this.ib = ib;
+    }
+
+    public IClient.Spiel getSpiel() {
+        return spiel;
+    }
+
+    public void setSpiel(IClient.Spiel spiel) {
+        this.spiel = spiel;
+    }
+
+    public boolean isB() {
+        return b;
+    }
+
+    public void setB(boolean b) {
+        this.b = b;
+    }
+
+    public String[] getLs() {
+        return ls;
+    }
+
+    public void setLs(String[] ls) {
+        this.ls = ls;
+    }
+
+    public IClient.Spiel[] getLspiel() {
+        return lspiel;
+    }
+
+    public void setLspiel(IClient.Spiel[] lspiel) {
+        this.lspiel = lspiel;
+    }
+
+    public Methode getMethode() {
+        return methode;
+    }
+
+    public void setMethode(Methode methode) {
+        this.methode = methode;
+    }
+
+    public enum Methode {
+        NOT_SET,
+        CL_LOGIN,
+        CL_NEUESSPIEL,
+        CL_ZUG,
+        CL_MITSPIELEN,
+        CL_NACHRICHT,
+        CL_ANTWORT_AUF_ANFRAGE,
+        CL_ABBRECHEN,
+        RET_CL_LOGIN,
+        RET_CL_NEUESSPIEL,
+        RET_CL_ZUG,
+        RET_CL_MITSPIELEN,
+        RET_CL_NACHRICHT,
+        SRV_SPIELERLISTE,
+        SRV_NACHRICHT
     }
 
 }

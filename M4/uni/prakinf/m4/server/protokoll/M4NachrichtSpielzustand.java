@@ -9,6 +9,7 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
 
     private IClient.Zustand zustand;
     private IClient.Spiel spiel;
+    private String gegenSpieler;
     private boolean spielfeldGueltig;
 
     private boolean spielfeldChomp[][];
@@ -17,11 +18,13 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
     /**
      * Konstruktor fuer uni.prakinf.m4.client.Chomp-Spielzustand
      *
-     * @param zustand   Spielzustand
-     * @param spielfeld Spielfeld
+     * @param zustand      Spielzustand
+     * @param gegenSpieler Name des Gegenspielers
+     * @param spielfeld    Spielfeld
      */
-    public M4NachrichtSpielzustand(IClient.Zustand zustand, boolean spielfeld[][]) {
+    public M4NachrichtSpielzustand(IClient.Zustand zustand, String gegenSpieler, boolean spielfeld[][]) {
         this.zustand = zustand;
+        this.gegenSpieler = gegenSpieler;
         this.spiel = IClient.Spiel.CHOMP;
         this.spielfeldChomp = spielfeld;
         this.spielfeldVierGewinnt = null;
@@ -31,11 +34,13 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
     /**
      * Konstruktor fuer Vier Gewinnt-Spielzustand
      *
-     * @param zustand   Spielzustand
-     * @param spielfeld Spielfeld
+     * @param zustand      Spielzustand
+     * @param gegenSpieler
+     * @param spielfeld    Spielfeld
      */
-    public M4NachrichtSpielzustand(IClient.Zustand zustand, IClient.VierGewinntStein spielfeld[][]) {
+    public M4NachrichtSpielzustand(IClient.Zustand zustand, String gegenSpieler, IClient.VierGewinntStein spielfeld[][]) {
         this.zustand = zustand;
+        this.gegenSpieler = gegenSpieler;
         this.spiel = IClient.Spiel.VIER_GEWINNT;
         this.spielfeldVierGewinnt = spielfeld;
         this.spielfeldChomp = null;
@@ -47,10 +52,12 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
      *
      * @param zustand
      * @param spiel
+     * @param gegenSpieler
      */
-    public M4NachrichtSpielzustand(IClient.Zustand zustand, IClient.Spiel spiel) {
+    public M4NachrichtSpielzustand(IClient.Zustand zustand, IClient.Spiel spiel, String gegenSpieler) {
         this.zustand = zustand;
         this.spiel = spiel;
+        this.gegenSpieler = gegenSpieler;
         this.spielfeldGueltig = false;
         this.spielfeldChomp = null;
         this.spielfeldVierGewinnt = null;
@@ -74,5 +81,9 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
 
     public IClient.VierGewinntStein[][] getSpielfeldVierGewinnt() {
         return spielfeldVierGewinnt;
+    }
+
+    public String getGegenSpieler() {
+        return gegenSpieler;
     }
 }

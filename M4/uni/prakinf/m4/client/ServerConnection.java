@@ -36,28 +36,48 @@ public class ServerConnection implements IServerConnection, M4Annahme {
 
         // Anmeldung
         System.out.println("ServerConnection: Anmeldung...");
-        M4NachrichtEinfach login_nr = new M4NachrichtEinfach(M4NachrichtEinfach.Art.CS_LOGIN, false, name, passwort, null);
+        M4NachrichtEinfach login_nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_LOGIN);
+        login_nr.setSa(name);
+        login_nr.setSb(passwort);
         thread.sendeNachrichtAsync(login_nr);
 
         // Antwort abwarten
         System.out.println("ServerConnection: Antwort abwarten...");
-        M4Nachricht antwort = thread.warteAufNachricht();
-        if (antwort instanceof M4NachrichtEinfach) {
-            M4NachrichtEinfach antwort_e = (M4NachrichtEinfach) antwort;
-            if (antwort_e.getArt() == M4NachrichtEinfach.Art.SC_LOGIN && antwort_e.isErfolg()) {
+        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_LOGIN);
+
+        if (antwort != null) {
+            if (antwort.isB()) {
+                verbindungszustand = Verbindungszustand.ANGEMELDET;
                 return true;
             } else {
-                return false;
+                verbindungszustand = Verbindungszustand.VERBUNDEN;
             }
         }
         return false;
     }
 
     public void antwortAufAnfrage(boolean ok) {
-
+        if (verbindungszustand == Verbindungszustand.GETRENNT) {
+            client.verbindungsFehler();
+            return;
+        }
+        M4NachrichtEinfach antwort_auf_anfrage = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_ANTWORT_AUF_ANFRAGE);
+        antwort_auf_anfrage.setB(true);
+        thread.sendeNachrichtAsync(antwort_auf_anfrage);
     }
 
     public boolean zug(int x, int y) {
+        M4NachrichtEinfach zug = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_ZUG);
+        zug.setIa(x);
+        zug.setIb(y);
+        thread.sendeNachrichtAsync(zug);
+
+        // Antwort abwarten
+        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_ZUG);
+
+        if (antwort != null) {
+            return antwort.isB();
+        }
         return false;
     }
 

@@ -22,18 +22,20 @@ public class M4TransportThread extends Thread {
     private Object userObject;
     // Zur Laufzeit
     private BlockingQueue<M4Nachricht> nachrichtenAusgehend;
-    private BlockingQueue<M4Nachricht> nachrichtenEingehend;
+    private BlockingQueue<M4NachrichtEinfach> nachrichtenEingehend;
     private boolean threadSollLaufen;
     private boolean nachrichtenEinreihen;
+    private M4NachrichtEinfach.Methode nachrichtenEinreihenMethode;
 
     private M4TransportThread(M4Annahme annahme, Object userObject) {
         this.annahme = annahme;
         this.userObject = userObject;
 
         nachrichtenAusgehend = new ArrayBlockingQueue<M4Nachricht>(M4CAP, true);
-        nachrichtenEingehend = new ArrayBlockingQueue<M4Nachricht>(M4CAP, true);
+        nachrichtenEingehend = new ArrayBlockingQueue<M4NachrichtEinfach>(M4CAP, true);
         threadSollLaufen = false;
         nachrichtenEinreihen = false;
+        nachrichtenEinreihenMethode = M4NachrichtEinfach.Methode.NOT_SET;
     }
 
     /**
@@ -97,8 +99,8 @@ public class M4TransportThread extends Thread {
                 final M4Nachricht nachricht = (M4Nachricht) i.readObject();
                 if (nachricht != null) {
                     synchronized (this) {
-                        if (nachrichtenEinreihen) {
-                            nachrichtenEingehend.put(nachricht);
+                        if (nachrichtenEinreihen && (nachricht instanceof M4NachrichtEinfach) && ((M4NachrichtEinfach) nachricht).getMethode() == nachrichtenEinreihenMethode) {
+                            nachrichtenEingehend.put((M4NachrichtEinfach) nachricht);
                         } else new Thread() {
                             @Override
                             public void run() {
@@ -145,12 +147,13 @@ public class M4TransportThread extends Thread {
         }
     }
 
-    public M4Nachricht warteAufNachricht() {
-        synchronized(this) {
-        nachrichtenEinreihen = true;
+    public M4NachrichtEinfach warteAufNachricht(M4NachrichtEinfach.Methode methode) {
+        synchronized (this) {
+            nachrichtenEinreihen = true;
+            nachrichtenEinreihenMethode = methode;
         }
         try {
-            M4Nachricht nachricht = nachrichtenEingehend.poll(M4BLOCKTIME, TimeUnit.MILLISECONDS);
+            M4NachrichtEinfach nachricht = nachrichtenEingehend.poll(M4BLOCKTIME, TimeUnit.MILLISECONDS);
             synchronized (this) {
                 nachrichtenEinreihen = false;
             }
