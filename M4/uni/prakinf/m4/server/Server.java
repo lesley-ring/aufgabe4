@@ -6,6 +6,9 @@ import uni.prakinf.m4.server.protokoll.M4NachrichtSpielzustand;
 import uni.prakinf.m4.server.protokoll.M4TransportThread;
 import uni.prakinf.m4.server.sitzung.Sitzung;
 
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,19 +33,67 @@ public class Server implements M4Annahme {
     }
 
     private class VerbindungsThread extends Thread {
+        private Server server;
+        private boolean weiterlaufen;
+        private ServerSocket socket;
 
+        private VerbindungsThread(Server server) {
+            this.server = server;
+            weiterlaufen = false;
+        }
+
+        public void run() {
+            weiterlaufen = true;
+            try {
+                socket = new ServerSocket(M4TransportThread.M4PORT);
+                socket.setSoTimeout(1000);
+            } catch (Exception e) {
+                System.err.printf("Fehler beim Erstellen des ServerSocket: %s\n", e.getMessage());
+            }
+
+            while (weiterlaufen) {
+                try {
+                    socket.accept();
+                } catch (SocketTimeoutException stex) {
+                    // Nichts tun!
+                } catch (Exception e) {
+                    System.err.printf("Fehler beim Abhören der Verbindung: %s\n", e.getMessage());
+                    weiterlaufen = false;
+                }
+            }
+
+        }
+
+        public void anhalten() {
+            weiterlaufen = false;
+        }
     }
 
-    // M4Annahme Methode
-
+    // M4Annahme Methoden
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (userObject instanceof Sitzung) {
+            Sitzung sitzung = (Sitzung) userObject;
+            switch (nachrichtEinfach.getMethode()) {
+                case CL_LOGIN:
+                    sitzung.login("", nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
+                    break;
+                case RET_CL_LOGIN:
+                case RET_CL_MITSPIELEN:
+                case RET_CL_NACHRICHT:
+                case RET_CL_NEUESSPIEL:
+                case RET_CL_ZUG:
+                    System.err.println("Server: Fehlerhafte Nachricht vom Client, ignoriert.");
+                    break;
+            }
+        } else {
+            System.err.println("Server: Fehlerhaftes userObject vom Transportthread!");
+        }
     }
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // Sollte nie aufgerufen werden!
     }
 
     @Override
