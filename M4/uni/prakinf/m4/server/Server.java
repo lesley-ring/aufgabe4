@@ -13,16 +13,23 @@ public class Server implements M4Annahme {
     private List<M4TransportThread> threads;
     private List<Sitzung> sitzungen;
 
+    private boolean bWeiter;
+
     public Server() {
         threads = new LinkedList<M4TransportThread>();
         sitzungen = new LinkedList<Sitzung>();
+        bWeiter = false;
     }
 
-    public void start() {
+    public void startServer() {
 
     }
 
-    public void stop() {
+    public void stopServer() {
+
+    }
+
+    private class VerbindungsThread extends Thread {
 
     }
 
@@ -146,7 +153,7 @@ public class Server implements M4Annahme {
 
 	public boolean checkLogin(String name, String password) {
 		boolean login_valid = false;
-		login_valid = PasswordManager.validateLogin(name, password);
+		login_valid = PasswortVerwaltung.passwortGueltig(name, password);
 
 		// Ist der Client bereits eingeloggt?
 		for (M4TransportThread client : clients) {

@@ -92,12 +92,11 @@ public class ServerConnection implements IServerConnection, M4Annahme {
         return false;
     }
 
-    public boolean nachricht(String name, String nachricht) {
-        return false;
+    public void nachricht(String name, String nachricht) {
+
     }
 
     // M4Annahme Methoden
-
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
 
@@ -106,7 +105,6 @@ public class ServerConnection implements IServerConnection, M4Annahme {
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
 
-        // HAllo
     }
 
     @Override

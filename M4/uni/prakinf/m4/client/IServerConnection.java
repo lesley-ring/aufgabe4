@@ -48,10 +48,8 @@ public interface IServerConnection {
 
     /**
      * Sendet eine Nachricht "nachricht" an den uni.prakinf.m4.client.Spieler "name".
-     *
-     * @return True, falls die Nachricht zugestellt wurde. Sonst false.
      */
-    public boolean nachricht(String name, String nachricht);
+    public void nachricht(String name, String nachricht);
 
     /**
      * Trennt die Verbindung zum Server

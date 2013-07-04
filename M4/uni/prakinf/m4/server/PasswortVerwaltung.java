@@ -7,11 +7,11 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PasswordManager {
+public class PasswortVerwaltung {
     private static final String FILENAME = ".cpasswords";
     private static Map<String, String> logins;
 
-    public static boolean validateLogin(String name, String password) {
+    public static boolean passwortGueltig(String name, String password) {
         boolean login_valid = false;
         loadLogins();
 
