@@ -13,6 +13,8 @@ public interface IClient {
 
     public void nachricht(String name, String nachricht);
 
+    public void spielZuende();
+
     public enum Zustand {
         KEIN_SPIELER,   // Warte auf Gegenspieler
         ANFRAGE,        // Gegenspieler gefunden, spielen?

@@ -1,5 +1,6 @@
 package uni.prakinf.m4.client;
 
+import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.server.protokoll.*;
 
 /**
@@ -28,21 +29,21 @@ public class ServerConnection implements IServerConnection, M4Annahme {
         if (verbindungszustand == Verbindungszustand.ANGEMELDET || verbindungszustand == Verbindungszustand.SPIELT)
             return false;
         if (verbindungszustand == Verbindungszustand.GETRENNT) {
-            System.out.println("ServerConnection: Erstelle Thread...");
+            Logger.logln("ServerConnection: Erstelle Thread...");
             thread = new M4TransportThread(this, null, server);
             thread.start();
             verbindungszustand = Verbindungszustand.VERBUNDEN;
         }
 
         // Anmeldung
-        System.out.println("ServerConnection: Anmeldung...");
+        Logger.logln("ServerConnection: Anmeldung...");
         M4NachrichtEinfach login_nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_LOGIN);
         login_nr.setSa(name);
         login_nr.setSb(passwort);
         thread.sendeNachrichtAsync(login_nr);
 
         // Antwort abwarten
-        System.out.println("ServerConnection: Antwort abwarten...");
+        Logger.logln("ServerConnection: Antwort abwarten...");
         M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_LOGIN);
 
         if (antwort != null) {
@@ -82,13 +83,40 @@ public class ServerConnection implements IServerConnection, M4Annahme {
     }
 
     public void abbrechen() {
+        M4NachrichtEinfach abbruch = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_ABBRECHEN);
+        thread.sendeNachrichtAsync(abbruch);
+
+        // Keine Antwort
     }
 
     public boolean neuesSpiel(IClient.Spiel spiel, int x, int y) {
+        M4NachrichtEinfach ns = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_NEUESSPIEL);
+        ns.setSpiel(spiel);
+        ns.setIa(x);
+        ns.setIb(y);
+        thread.sendeNachrichtAsync(ns);
+
+        // Antwort abwarten
+        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL);
+
+        if (antwort != null) {
+            return antwort.isB();
+        }
         return false;
     }
 
     public boolean mitspielen(String name, IClient.Spiel spiel) {
+        M4NachrichtEinfach ms = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_MITSPIELEN);
+        ms.setSa(name);
+        ms.setSpiel(spiel);
+        thread.sendeNachrichtAsync(ms);
+
+        // Antwort abwarten
+        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN);
+
+        if (antwort != null) {
+            return antwort.isB();
+        }
         return false;
     }
 
@@ -99,7 +127,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
     // M4Annahme Methoden
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
-
+        M4Decoder.decodiereServerNachricht(client, nachrichtEinfach);
     }
 
     @Override
@@ -116,7 +144,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
                 break;
             case GETRENNT:
             case VERBUNDEN:
-                System.out.printf("ServerConnection: Verbindungsfehler (%s)\n", exception.getMessage());
+                Logger.logf("ServerConnection: Verbindungsfehler (%s)\n", exception.getMessage());
                 break;
         }
         verbindungszustand = Verbindungszustand.GETRENNT;
@@ -128,8 +156,13 @@ public class ServerConnection implements IServerConnection, M4Annahme {
             case SPIELT:
             case ANGEMELDET:
             case VERBUNDEN:
-                if (thread != null)
+                if (thread != null) {
+                    thread.sendeNachrichtAsync(new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_TRENNEN));
                     thread.abbruch();
+                    thread = null;
+                    verbindungszustand = Verbindungszustand.GETRENNT;
+                }
+                break;
         }
     }
 

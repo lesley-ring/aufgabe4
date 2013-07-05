@@ -1,5 +1,6 @@
 package uni.prakinf.m4.server.sitzung;
 
+import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.server.PasswortVerwaltung;
 import uni.prakinf.m4.server.Server;
@@ -13,6 +14,7 @@ public class Sitzung implements IClient {
     private M4TransportThread thread;
     private Sitzungszustand sitzungszustand;
     private LaufendesSpiel spiel;
+
     private Spiel spielTyp;
     private String sitzungName;
 
@@ -22,6 +24,11 @@ public class Sitzung implements IClient {
         sitzungszustand = Sitzungszustand.VERBUNDEN;
         sitzungName = "";
         spiel = null;
+        spielTyp = Spiel.KEINS;
+    }
+
+    public Spiel getSpielTyp() {
+        return spielTyp;
     }
 
     public M4TransportThread getThread() {
@@ -39,8 +46,14 @@ public class Sitzung implements IClient {
         thread.sendeNachrichtAsync(nachrichtEinfach);
     }
 
+    @Override
+    public void spielZuende() {
+
+    }
+
     public void sitzungVerlassen() {
         try {
+            server.entferne(this, getThread());
             thread.abbruch();
         } catch (Exception ex) {
 
@@ -48,12 +61,17 @@ public class Sitzung implements IClient {
     }
 
     // IServerConnection Methoden - Aufruf von außen durch Decoder im Server!
-    public void login(String server, String name, String passwort) {
+    public void login(String name, String passwort) {
         if (sitzungszustand == Sitzungszustand.VERBUNDEN) {
-            boolean result = PasswortVerwaltung.passwortGueltig(name, passwort);
-            if (result)
+            boolean result = PasswortVerwaltung.passwortGueltig(name, passwort) && !server.istAngemeldet(name);
+            if (result) {
                 sitzungszustand = Sitzungszustand.ANGEMELDET;
+                sitzungName = name;
+            }
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_LOGIN, result);
+
+            if (result)
+                server.sitzungenVerteilen();
         } else
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_LOGIN, false);
 
@@ -75,7 +93,7 @@ public class Sitzung implements IClient {
             sitzungszustand = Sitzungszustand.ANGEMELDET;
             spielTyp = Spiel.KEINS;
         } else {
-            System.err.println("Sitzung: Abbruch nicht erlaubt!");
+            Logger.errln("Sitzung: Abbruch nicht erlaubt!");
         }
     }
 
@@ -101,7 +119,8 @@ public class Sitzung implements IClient {
     }
 
     public void verbindungTrennen() {
-        abbrechen();
+        if(sitzungszustand==Sitzungszustand.SPIELT)
+            abbrechen();
         sitzungVerlassen();
     }
 

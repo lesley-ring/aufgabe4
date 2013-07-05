@@ -1,5 +1,6 @@
 package uni.prakinf.m4.server.sitzung;
 
+import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 
@@ -15,11 +16,23 @@ public abstract class LaufendesSpiel {
         zustand = Zustand.WARTE_AUF_ZWEITE_SITZUNG;
     }
 
+    public String getSpielerAName () {
+        if(sitzungA != null)
+            return sitzungA.getSitzungName();
+        return "";
+    }
+
+    public String getSpielerBName () {
+        if(sitzungB != null)
+            return sitzungB.getSitzungName();
+        return "";
+    }
+
     public void los() {
         if (zustand == Zustand.WARTE_AUF_ZWEITE_SITZUNG)
             benachrichtigeClients(sitzungA, Spieler.A);
         else
-            System.err.printf("LaufendesSpiel: Falscher Zustand!\n");
+            Logger.errf("LaufendesSpiel: Falscher Zustand!\n");
     }
 
     public void zweiteSitzung(Sitzung sitzungB) {
@@ -30,7 +43,7 @@ public abstract class LaufendesSpiel {
             benachrichtigeAlle();
         } else {
             sitzungB.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
-            System.err.printf("LaufendesSpiel: Falscher Zustand!\n");
+            Logger.errf("LaufendesSpiel: Falscher Zustand!\n");
         }
 
     }
@@ -48,7 +61,7 @@ public abstract class LaufendesSpiel {
             }
 
         } else {
-            System.err.println("LaufendesSpiel: Antwort ohne Anfrage");
+            Logger.errln("LaufendesSpiel: Antwort ohne Anfrage");
         }
     }
 
@@ -72,7 +85,7 @@ public abstract class LaufendesSpiel {
         } else {
             if (sitzung != null)
                 sitzung.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, false);
-            System.err.println("LaufendesSpiel: Fehlerhafte Sitzung übergeben!");
+            Logger.errln("LaufendesSpiel: Fehlerhafte Sitzung übergeben!");
         }
     }
 
@@ -114,14 +127,10 @@ public abstract class LaufendesSpiel {
     }
 
     public void beenden() {
-        zustand = Zustand.ENDE;
-        // TODO warten
-        benachrichtigeAlle();
-
         if (sitzungA != null)
-            sitzungA.abbrechen();
+            sitzungA.spielZuende();
         if (sitzungB != null)
-            sitzungB.abbrechen();
+            sitzungB.spielZuende();
     }
 
     private void benachrichtigeAlle() {
@@ -151,8 +160,7 @@ public abstract class LaufendesSpiel {
         SITZUNG_B_ZUG,
         SITZUNG_A_GEWONNEN,
         SITZUNG_B_GEWONNEN,
-        UNENTSCHIEDEN,
-        ENDE
+        UNENTSCHIEDEN
     }
 
     enum Spieler {

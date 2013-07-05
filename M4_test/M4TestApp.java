@@ -5,12 +5,12 @@ public class M4TestApp {
         Server server = new Server();
         server.startServer();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(500);
         } catch (Exception e) {
         }
         new M4ClientTest().los();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (Exception e) {
         }
         server.stopServer();

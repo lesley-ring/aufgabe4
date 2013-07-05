@@ -1,46 +1,66 @@
+import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.client.IServerConnection;
 import uni.prakinf.m4.client.ServerConnection;
 
 public class M4ClientTest implements IClient {
     public void los() {
-        IServerConnection conn = new ServerConnection();
-        System.out.println("M4ClientTest: Anmeldung...");
-        if (!conn.login("localhost", "Clemens", "test")) {
-            System.out.println("M4ClientTest: Fehler!");
-            conn.verbindungTrennen();
-            System.exit(-1);
-        }
-        System.out.println("M4ClientTest: Login okay!");
-        conn.verbindungTrennen();
-        System.exit(0);
-    }
+        IServerConnection serverConnectionA = new ServerConnection();
+        serverConnectionA.setClient(this);
+        Logger.logln("M4ClientTest: Anmeldung A...");
+        if (!serverConnectionA.login("localhost", "Clemens", "test")) {
+            Logger.logln("M4ClientTest: Fehler!");
+            serverConnectionA.verbindungTrennen();
+            return;
+        } else
+            Logger.logln("M4ClientTest: Anmeldung A okay!");
 
+        if (!serverConnectionA.neuesSpiel(Spiel.CHOMP, 5, 7)) {
+            Logger.errln("Kann kein neues Spiel erstellen!");
+            serverConnectionA.verbindungTrennen();
+            return;
+        }
+
+        Logger.logln("M4ClientTest: Spiele Chomp.");
+
+        try {
+            Thread.sleep(2000);
+        } catch (Exception x) {
+
+        }
+
+        serverConnectionA.verbindungTrennen();
+    }
 
     @Override
     public void verbindungsFehler() {
-        System.out.println("M4ClientTest: Verbindungsfehler!");
+        Logger.logln("M4ClientTest: Verbindungsfehler!");
     }
 
     @Override
     public void neuerZustandChomp(Zustand zustand, boolean[][] spielfeld, String gegenspieler) {
-        System.out.println("M4ClientTest: Neuer uni.prakinf.m4.client.Chomp-Zustand!");
+        Logger.logln("M4ClientTest: Neuer uni.prakinf.m4.client.Chomp-Zustand!");
     }
 
     @Override
     public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein[][] spielfeld, String gegenspieler) {
-        System.out.println("M4ClientTest: Neuer Vier Gewinnt-Zustand!");
+        Logger.logln("M4ClientTest: Neuer Vier Gewinnt-Zustand!");
     }
 
     @Override
     public void spielerListe(String[] name, Spiel[] spiel) {
-        System.out.println("M4ClientTest: uni.prakinf.m4.client.Spieler: ");
+        Logger.logln("M4ClientTest: Spieler: ");
         for (String sname : name)
-            System.out.println("M4ClientTest: " + name);
+            Logger.logln("              " + sname);
     }
 
     @Override
     public void nachricht(String name, String nachricht) {
-        System.out.printf("M4ClientTest: Neue Nachricht von %s: %s\n", name, nachricht);
+        Logger.logf("M4ClientTest: Neue Nachricht von %s: %s\n", name, nachricht);
+    }
+
+    @Override
+    public void spielZuende() {
+        Logger.logln("M4ClientTest: Spiel zuende!");
     }
 }

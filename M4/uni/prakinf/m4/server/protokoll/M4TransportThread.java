@@ -1,5 +1,7 @@
 package uni.prakinf.m4.server.protokoll;
 
+import uni.prakinf.m4.Logger;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -91,14 +93,15 @@ public class M4TransportThread extends Thread {
 
         threadSollLaufen = true;
 
-        while (threadSollLaufen) {
+        while (threadSollLaufen || (nachrichtenAusgehend.peek() != null)) {
             try {
                 if (nachrichtenAusgehend.peek() != null) {
-                    System.out.printf("Sende Nachricht\n");
+                    Logger.logf("M4TransportThread: Sende Nachricht\n");
                     o.writeObject(nachrichtenAusgehend.take());
                 }
                 final M4Nachricht nachricht = (M4Nachricht) i.readObject();
                 if (nachricht != null) {
+                    Logger.logf("M4TransportThread: Nachricht empfangen\n");
                     synchronized (this) {
                         if (nachrichtenEinreihen && (nachricht instanceof M4NachrichtEinfach) && ((M4NachrichtEinfach) nachricht).getMethode() == nachrichtenEinreihenMethode) {
                             nachrichtenEingehend.put((M4NachrichtEinfach) nachricht);

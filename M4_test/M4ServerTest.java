@@ -1,3 +1,4 @@
+import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.server.protokoll.M4Annahme;
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 import uni.prakinf.m4.server.protokoll.M4NachrichtSpielzustand;
@@ -11,11 +12,11 @@ public class M4ServerTest implements M4Annahme {
     private M4TransportThread thread;
 
     public M4ServerTest(Socket socket) {
-        System.out.println("M4ServerTest: Erstelle Transportthread...");
+        Logger.logln("M4ServerTest: Erstelle Transportthread...");
         this.socket = socket;
         thread = new M4TransportThread(this, null, socket);
         thread.start();
-        System.out.println("M4ServerTest: Okay.");
+        Logger.logln("M4ServerTest: Okay.");
     }
 
     public static void los() {
@@ -23,17 +24,17 @@ public class M4ServerTest implements M4Annahme {
             @Override
             public void run() {
                 try {
-                    System.out.println("M4ServerTest: Erstelle Socket...");
+                    Logger.logln("M4ServerTest: Erstelle Socket...");
                     ServerSocket serverSocket = new ServerSocket(M4TransportThread.M4PORT);
                     int i = 1;
                     while (i > 0) {
-                        System.out.println("M4ServerTest: Warte auf Anfrage...");
+                        Logger.logln("M4ServerTest: Warte auf Anfrage...");
                         new M4ServerTest(serverSocket.accept());
                         i--;
                     }
 
                 } catch (Exception e) {
-                    System.out.printf("M4ServerTest: Fehler: %s", e.getMessage());
+                    Logger.logf("M4ServerTest: Fehler: %s", e.getMessage());
                 }
             }
         }.start();
@@ -41,7 +42,7 @@ public class M4ServerTest implements M4Annahme {
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
-        System.out.printf("M4ServerTest: Nachricht (einfach). Methode: %s \n", nachrichtEinfach.getMethode().toString());
+        Logger.logf("M4ServerTest: Nachricht (einfach). Methode: %s \n", nachrichtEinfach.getMethode().toString());
         if (nachrichtEinfach.getMethode() == M4NachrichtEinfach.Methode.CL_LOGIN) {
             M4NachrichtEinfach antwort = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.RET_CL_LOGIN);
             antwort.setB(true);
@@ -51,11 +52,11 @@ public class M4ServerTest implements M4Annahme {
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
-        System.out.printf("M4ServerTest: Nachricht (Spielzustand)\n");
+        Logger.logf("M4ServerTest: Nachricht (Spielzustand)\n");
     }
 
     @Override
     public void verbindungsFehler(Object userObject, Exception exception) {
-        System.out.printf("M4ServerTest: Verbindungsfehler: %s\n", exception.getMessage());
+        Logger.logf("M4ServerTest: Verbindungsfehler: %s\n", exception.getMessage());
     }
 }

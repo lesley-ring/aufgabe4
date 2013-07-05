@@ -112,13 +112,15 @@ public class M4NachrichtEinfach extends M4Nachricht implements Serializable {
         CL_NACHRICHT,
         CL_ANTWORT_AUF_ANFRAGE,
         CL_ABBRECHEN,
+        CL_TRENNEN,
         RET_CL_LOGIN,
         RET_CL_NEUESSPIEL,
         RET_CL_ZUG,
         RET_CL_MITSPIELEN,
         RET_CL_NACHRICHT,
         SRV_SPIELERLISTE,
-        SRV_NACHRICHT
+        SRV_NACHRICHT,
+        SRV_SPIEL_ENDE
     }
 
 }

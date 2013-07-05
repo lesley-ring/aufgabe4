@@ -39,7 +39,20 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public void benachrichtigeClients(IClient client, Spieler spieler) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        switch (spieler) {
+            case A:
+                switch (zustand) {
+                    case WARTE_AUF_ZWEITE_SITZUNG:
+                        client.neuerZustandChomp(IClient.Zustand.KEIN_SPIELER, spielfeld, "");
+                        break;
+                    case WARTE_AUF_ANNAHME:
+                        client.neuerZustandChomp(IClient.Zustand.ANFRAGE, spielfeld, getSpielerBName());
+                        break;
+                }
+                break;
+            case B:
+                break;
+        }
     }
 
     @Override

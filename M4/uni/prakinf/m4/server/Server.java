@@ -1,18 +1,20 @@
 package uni.prakinf.m4.server;
 
+import uni.prakinf.m4.Logger;
+import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.server.protokoll.*;
 import uni.prakinf.m4.server.sitzung.Sitzung;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Server implements M4Annahme {
     private List<M4TransportThread> threads;
     private List<Sitzung> sitzungen;
-
     private VerbindungsThread vthread;
 
 
@@ -22,17 +24,22 @@ public class Server implements M4Annahme {
     }
 
     public void startServer() {
+        Logger.logln("Server: Starte Server...");
         vthread = new VerbindungsThread(this);
         vthread.start();
     }
 
     public void stopServer() {
         if (vthread != null) {
-            for (M4TransportThread thread : threads) {
-                thread.abbruch();
+            synchronized (threads) {
+                for (M4TransportThread thread : threads) {
+                    thread.abbruch();
+                }
+                threads.clear();
             }
-            threads.clear();
-            sitzungen.clear();
+            synchronized (sitzungen) {
+                sitzungen.clear();
+            }
 
             vthread.anhalten();
             vthread = null;
@@ -42,15 +49,92 @@ public class Server implements M4Annahme {
 
     public void entferne(Sitzung sitzung, M4TransportThread thread) {
         try {
-            sitzungen.remove(sitzung);
-            threads.remove(thread);
+            synchronized (sitzungen) {
+                sitzungen.remove(sitzung);
+            }
+            synchronized (threads) {
+                threads.remove(thread);
+            }
         } catch (Exception ex) {
 
         }
+        sitzungenVerteilen();
     }
 
     public Sitzung findeSitzung(String name) {
+        synchronized (sitzungen) {
+            for (Sitzung sitzung : sitzungen) {
+                if (sitzung.getSitzungName().equals(name))
+                    return sitzung;
+            }
+        }
+        return null;
+    }
 
+    public void sitzungenVerteilen() {
+        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<IClient.Spiel> games = new ArrayList<IClient.Spiel>();
+        final ArrayList<Sitzung> sessions = new ArrayList<Sitzung>();
+        synchronized (sitzungen) {
+            for (Sitzung sitzung: sitzungen)
+                if(sitzung.getSitzungName() != "" && sitzung.getSitzungName() != null) {
+                    names.add(sitzung.getSitzungName());
+                    games.add(sitzung.getSpielTyp());
+                    sessions.add(sitzung);
+                }
+        }
+
+        final String[] anames = names.toArray(new String[names.size()]);
+        final IClient.Spiel[] agames = games.toArray(new IClient.Spiel[games.size()]);
+
+        new Thread() {
+            public void run() {
+                Logger.logf("Server: Verteile %d Sitzungen...\n", sessions.size());
+                for (Sitzung sitzung : sessions) {
+                    try {
+                        sitzung.spielerListe(anames, agames);
+                    } catch (Exception e) {
+                        Logger.errf("Server: Fehler bei Sitzungsverteilung: %s\n", e.getMessage());
+                    }
+                }
+                Logger.logln("Server: Sitzungsverteilung fertig.");
+            }
+        }.start();
+    }
+
+    // M4Annahme Methoden
+    @Override
+    public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
+        if (userObject instanceof Sitzung)
+            M4Decoder.decodiereClientNachricht((Sitzung) userObject, nachrichtEinfach);
+        else
+            Logger.errln("Server: Fehlerhaftes userObject vom Transportthread!");
+    }
+
+    @Override
+    public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
+        // Sollte nie aufgerufen werden, da diese Nachrichten vom Client kommen!
+        Logger.errf("Server: Fehlerhafte Nachricht vom Client (Spielzustand), ignoriert\n");
+    }
+
+    @Override
+    public void verbindungsFehler(Object userObject, Exception exception) {
+        if (userObject instanceof Sitzung) {
+            Sitzung sitzung = (Sitzung) userObject;
+            Logger.errf("Server: Ausnahme in Transportthread: %s\n", exception.getMessage());
+            sitzung.verbindungTrennen();
+        } else {
+            Logger.errln("Server: Fehlerhaftes userObject vom Transportthread!");
+        }
+    }
+
+    public boolean istAngemeldet(String name) {
+        synchronized (sitzungen) {
+            for(Sitzung sitzung : sitzungen)
+                if(sitzung.getSitzungName()!= null && sitzung.getSitzungName().equals(name))
+                    return true;
+        }
+        return false;
     }
 
     // Verbindungsannahme
@@ -70,59 +154,35 @@ public class Server implements M4Annahme {
                 socket = new ServerSocket(M4TransportThread.M4PORT);
                 socket.setSoTimeout(1000);
             } catch (Exception e) {
-                System.err.printf("Fehler beim Erstellen des ServerSocket: %s\n", e.getMessage());
+                Logger.errf("Server: Fehler beim Erstellen des ServerSocket: %s\n", e.getMessage());
             }
-
+            Logger.logln("Server: Höre ab...");
             while (weiterlaufen) {
                 try {
                     Socket s = socket.accept();
                     M4TransportThread transportThread = new M4TransportThread(server, null, s);
                     Sitzung sitzung = new Sitzung(server, transportThread);
                     transportThread.setUserObject(sitzung);
-
-                    server.sitzungen.add(sitzung);
-                    server.threads.add(transportThread);
+                    synchronized (server.sitzungen) {
+                        server.sitzungen.add(sitzung);
+                    }
+                    synchronized (server.threads) {
+                        server.threads.add(transportThread);
+                    }
 
                     transportThread.start();
                 } catch (SocketTimeoutException stex) {
                     // Nichts tun!
                 } catch (Exception e) {
-                    System.err.printf("Fehler beim Abhören der Verbindung: %s\n", e.getMessage());
+                    Logger.errf("Server: Fehler beim Abhören der Verbindung: %s\n", e.getMessage());
                     weiterlaufen = false;
                 }
             }
-
+            Logger.logln("Server: Verbindungsthread beenden...");
         }
 
         public void anhalten() {
             weiterlaufen = false;
-        }
-    }
-
-    // M4Annahme Methoden
-    @Override
-    public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
-        if (userObject instanceof Sitzung)
-            M4DecoderClientToServer.decodiereNachricht((Sitzung) userObject, nachrichtEinfach);
-        else
-            System.err.println("Server: Fehlerhaftes userObject vom Transportthread!");
-    }
-
-
-    @Override
-    public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
-        // Sollte nie aufgerufen werden, da diese Nachrichten vom Client kommen!
-        System.err.printf("Server: Fehlerhafte Nachricht vom Client (Spielzustand), ignoriert\n");
-    }
-
-    @Override
-    public void verbindungsFehler(Object userObject, Exception exception) {
-        if (userObject instanceof Sitzung) {
-            Sitzung sitzung = (Sitzung) userObject;
-            System.err.printf("Server: Ausnahme in Transportthread: %s\n", exception.getMessage());
-            // TODO Sitzung benachrichtigen
-        } else {
-            System.err.println("Server: Fehlerhaftes userObject vom Transportthread!");
         }
     }
 

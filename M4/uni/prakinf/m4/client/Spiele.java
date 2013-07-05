@@ -109,6 +109,11 @@ public class Spiele implements IClient, ActionListener {
     }
 
     @Override
+    public void spielZuende() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void spielerListe(String[] name, Spiel[] spiel) {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("SpielerListe");
