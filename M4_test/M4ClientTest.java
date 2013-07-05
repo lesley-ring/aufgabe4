@@ -8,6 +8,8 @@ public class M4ClientTest implements IClient {
         System.out.println("M4ClientTest: Anmeldung...");
         if (!conn.login("localhost", "Clemens", "test")) {
             System.out.println("M4ClientTest: Fehler!");
+            conn.verbindungTrennen();
+            System.exit(-1);
         }
         System.out.println("M4ClientTest: Login okay!");
         conn.verbindungTrennen();

@@ -9,11 +9,11 @@ import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 import uni.prakinf.m4.server.protokoll.M4NachrichtSpielzustand;
 import uni.prakinf.m4.server.protokoll.M4TransportThread;
 
-public class Sitzung implements IClient, IServerConnection {
+public class Sitzung implements IClient {
     private Server server;
     private M4TransportThread thread;
     private Sitzungszustand sitzungszustand;
-    private IClient.Spiel spiel;
+    private LaufendesSpiel spiel;
 
     private String sitzung_name;
 
@@ -21,6 +21,7 @@ public class Sitzung implements IClient, IServerConnection {
         this.server = server;
         this.thread = thread;
         sitzungszustand = Sitzungszustand.VERBUNDEN;
+        spiel = null;
     }
 
     public M4TransportThread getThread() {
@@ -32,44 +33,54 @@ public class Sitzung implements IClient, IServerConnection {
             thread.sendeNachrichtAsync(nachricht);
     }
 
+    public void sendeErgebnisAsync(M4NachrichtEinfach.Methode methode, boolean erfolg) {
+        M4NachrichtEinfach nachrichtEinfach = new M4NachrichtEinfach(methode);
+        nachrichtEinfach.setB(erfolg);
+        thread.sendeNachrichtAsync(nachrichtEinfach);
+    }
+
     // IServerConnection Methoden - Aufruf von außen durch Decoder im Server!
-    @Override
-    public boolean login(String server, String name, String passwort) {
+    public void login(String server, String name, String passwort) {
         if (sitzungszustand == Sitzungszustand.VERBUNDEN) {
             boolean result = PasswortVerwaltung.passwortGueltig(name, passwort);
             if (result)
                 sitzungszustand = Sitzungszustand.ANGEMELDET;
-            return result;
+            sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_LOGIN, result);
         } else
-            return false;
+            sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_LOGIN, false);
+
     }
 
-    @Override
     public void antwortAufAnfrage(boolean ok) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
     public boolean zug(int x, int y) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
     public void abbrechen() {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
-    @Override
-    public boolean neuesSpiel(Spiel spiel, int x, int y) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public void neuesSpiel(Spiel spiel, int x, int y) {
+        if (sitzungszustand != Sitzungszustand.ANGEMELDET)
+            sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
+        switch (spiel) {
+            case CHOMP:
+                spiel = new LaufendesSpielChomp(this, x, y);
+                sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, true);
+                spiel.los();
+                break;
+            case VIER_GEWINNT:
+                break;
+        }
     }
 
-    @Override
-    public boolean mitspielen(String name, Spiel spiel) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public void mitspielen(String name, Spiel spiel) {
+
     }
 
-    @Override
     public void verbindungTrennen() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -104,7 +115,6 @@ public class Sitzung implements IClient, IServerConnection {
     }
 
     // Nie aufgerufene Methoden
-    @Override
     public void setClient(IClient client) {
         // Nie aufgerufen!
     }

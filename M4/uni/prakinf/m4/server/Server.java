@@ -27,6 +27,16 @@ public class Server implements M4Annahme {
     }
 
     public void stopServer() {
+        if (vthread != null) {
+            for (M4TransportThread thread : threads) {
+                thread.abbruch();
+            }
+            threads.clear();
+            sitzungen.clear();
+
+            vthread.anhalten();
+            vthread = null;
+        }
 
     }
 

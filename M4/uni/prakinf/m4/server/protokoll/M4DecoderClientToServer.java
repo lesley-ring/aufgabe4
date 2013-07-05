@@ -8,18 +8,13 @@ public class M4DecoderClientToServer {
 
         switch (nachrichtEinfach.getMethode()) {
             case CL_LOGIN:
-                boolean login_result = sitzung.login("", nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
-                M4NachrichtEinfach nr_login_res = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.RET_CL_LOGIN);
-                nr_login_res.setB(login_result);
-                sitzung.sendeNachrichtAsync(nr_login_res);
+                sitzung.login("", nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
                 break;
             case CL_MITSPIELEN:
-                boolean mitspielen_result = sitzung.mitspielen(nachrichtEinfach.getSa(), nachrichtEinfach.getSpiel());
-                M4NachrichtEinfach nr_mitspielen_res = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN);
-                nr_mitspielen_res.setB(mitspielen_result);
-                sitzung.sendeNachrichtAsync(nr_mitspielen_res);
+                sitzung.mitspielen(nachrichtEinfach.getSa(), nachrichtEinfach.getSpiel());
                 break;
             case CL_NEUESSPIEL:
+                sitzung.neuesSpiel(nachrichtEinfach.getSpiel(), nachrichtEinfach.getIa(), nachrichtEinfach.getIb());
                 break;
             case RET_CL_LOGIN:
             case RET_CL_MITSPIELEN:
