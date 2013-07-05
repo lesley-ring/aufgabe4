@@ -1,7 +1,6 @@
 package uni.prakinf.m4.server.sitzung;
 
 import uni.prakinf.m4.client.IClient;
-import uni.prakinf.m4.client.IServerConnection;
 import uni.prakinf.m4.server.PasswortVerwaltung;
 import uni.prakinf.m4.server.Server;
 import uni.prakinf.m4.server.protokoll.M4Nachricht;
@@ -14,13 +13,14 @@ public class Sitzung implements IClient {
     private M4TransportThread thread;
     private Sitzungszustand sitzungszustand;
     private LaufendesSpiel spiel;
-
-    private String sitzung_name;
+    private Spiel spielTyp;
+    private String sitzungName;
 
     public Sitzung(Server server, M4TransportThread thread) {
         this.server = server;
         this.thread = thread;
         sitzungszustand = Sitzungszustand.VERBUNDEN;
+        sitzungName = "";
         spiel = null;
     }
 
@@ -37,6 +37,14 @@ public class Sitzung implements IClient {
         M4NachrichtEinfach nachrichtEinfach = new M4NachrichtEinfach(methode);
         nachrichtEinfach.setB(erfolg);
         thread.sendeNachrichtAsync(nachrichtEinfach);
+    }
+
+    public void sitzungVerlassen() {
+        try {
+            thread.abbruch();
+        } catch (Exception ex) {
+
+        }
     }
 
     // IServerConnection Methoden - Aufruf von außen durch Decoder im Server!
@@ -60,19 +68,30 @@ public class Sitzung implements IClient {
     }
 
     public void abbrechen() {
-
+        if (sitzungszustand == Sitzungszustand.SPIELT) {
+            if (spiel != null)
+                spiel.beenden();
+            spiel = null;
+            sitzungszustand = Sitzungszustand.ANGEMELDET;
+            spielTyp = Spiel.KEINS;
+        } else {
+            System.err.println("Sitzung: Abbruch nicht erlaubt!");
+        }
     }
 
-    public void neuesSpiel(Spiel spiel, int x, int y) {
+    public void neuesSpiel(Spiel spielart, int x, int y) {
         if (sitzungszustand != Sitzungszustand.ANGEMELDET)
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
-        switch (spiel) {
+        switch (spielart) {
             case CHOMP:
                 spiel = new LaufendesSpielChomp(this, x, y);
                 sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, true);
+                sitzungszustand = Sitzungszustand.SPIELT;
+                spielTyp = Spiel.CHOMP;
                 spiel.los();
                 break;
             case VIER_GEWINNT:
+                sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
                 break;
         }
     }
@@ -82,7 +101,8 @@ public class Sitzung implements IClient {
     }
 
     public void verbindungTrennen() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        abbrechen();
+        sitzungVerlassen();
     }
 
     // IClient Methoden - Aufruf: Nachricht weiterleiten an Client
@@ -122,6 +142,10 @@ public class Sitzung implements IClient {
     @Override
     public void verbindungsFehler() {
         // Nie aufgerufen!
+    }
+
+    public String getSitzungName() {
+        return sitzungName;
     }
 
     private enum Sitzungszustand {

@@ -16,6 +16,9 @@ public class M4DecoderClientToServer {
             case CL_NEUESSPIEL:
                 sitzung.neuesSpiel(nachrichtEinfach.getSpiel(), nachrichtEinfach.getIa(), nachrichtEinfach.getIb());
                 break;
+            case CL_ZUG:
+                sitzung.zug(nachrichtEinfach.getIa(), nachrichtEinfach.getIb());
+                break;
             case RET_CL_LOGIN:
             case RET_CL_MITSPIELEN:
             case RET_CL_NACHRICHT:

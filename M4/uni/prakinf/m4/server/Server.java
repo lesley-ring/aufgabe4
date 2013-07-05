@@ -40,6 +40,19 @@ public class Server implements M4Annahme {
 
     }
 
+    public void entferne(Sitzung sitzung, M4TransportThread thread) {
+        try {
+            sitzungen.remove(sitzung);
+            threads.remove(thread);
+        } catch (Exception ex) {
+
+        }
+    }
+
+    public Sitzung findeSitzung(String name) {
+
+    }
+
     // Verbindungsannahme
     private class VerbindungsThread extends Thread {
         private Server server;

@@ -1,37 +1,77 @@
 package uni.prakinf.m4.server.sitzung;
 
 import uni.prakinf.m4.client.IClient;
+import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 
 public abstract class LaufendesSpiel {
     private Sitzung sitzungA;
     private Sitzung sitzungB;
-    private Zustand zustand;
+
+    Zustand zustand;
 
     LaufendesSpiel(Sitzung sitzungA) {
         this.sitzungA = sitzungA;
         this.sitzungB = null;
-        zustand = Zustand.WARTE_AUF_ANNAHME;
+        zustand = Zustand.WARTE_AUF_ZWEITE_SITZUNG;
     }
 
     public void los() {
-        if (zustand == Zustand.WARTE_AUF_ANNAHME)
+        if (zustand == Zustand.WARTE_AUF_ZWEITE_SITZUNG)
             benachrichtigeClients(sitzungA, Spieler.A);
         else
             System.err.printf("LaufendesSpiel: Falscher Zustand!\n");
     }
 
+    public void zweiteSitzung(Sitzung sitzungB) {
+        // TODO Timer?
+        if (zustand == Zustand.WARTE_AUF_ZWEITE_SITZUNG) {
+            this.sitzungB = sitzungB;
+            zustand = Zustand.WARTE_AUF_ANNAHME;
+            benachrichtigeAlle();
+        } else {
+            sitzungB.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
+            System.err.printf("LaufendesSpiel: Falscher Zustand!\n");
+        }
+
+    }
+
+    public void antwortAufAnfrage(Sitzung sitzung, boolean antwort) {
+        if (sitzung == sitzungA && zustand == Zustand.WARTE_AUF_ANNAHME) {
+            sitzungB.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, antwort);
+            if (antwort) {
+                zustand = Zustand.SITZUNG_A_ZUG;
+                benachrichtigeAlle();
+            } else {
+                sitzungB = null;
+                zustand = Zustand.WARTE_AUF_ZWEITE_SITZUNG;
+                los();
+            }
+
+        } else {
+            System.err.println("LaufendesSpiel: Antwort ohne Anfrage");
+        }
+    }
+
     public void zug(Sitzung sitzung, int x, int y) {
         if (sitzung == sitzungA) {
             if (zugGueltig(Spieler.A, x, y) && zustand == Zustand.SITZUNG_A_ZUG) {
+                sitzungA.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, true);
                 setzeZug(Spieler.A, x, y);
                 weiter();
+            } else {
+                sitzungA.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, false);
             }
         } else if (sitzung == sitzungB) {
             if (zugGueltig(Spieler.B, x, y) && zustand == Zustand.SITZUNG_B_ZUG) {
+                sitzungB.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, true);
                 setzeZug(Spieler.B, x, y);
                 weiter();
+            } else {
+                sitzungB.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, false);
             }
         } else {
+            if (sitzung != null)
+                sitzung.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, false);
             System.err.println("LaufendesSpiel: Fehlerhafte Sitzung übergeben!");
         }
     }
@@ -41,8 +81,47 @@ public abstract class LaufendesSpiel {
         switch (zustand) {
             case SITZUNG_A_ZUG:
             case SITZUNG_B_ZUG:
+                if (spielZuende()) {
+                    switch (gewinner()) {
+                        case A:
+                            zustand = Zustand.SITZUNG_A_GEWONNEN;
+                            break;
+                        case B:
+                            zustand = Zustand.SITZUNG_B_GEWONNEN;
+                            break;
+                        default:
+                            zustand = Zustand.UNENTSCHIEDEN;
+                    }
+                    benachrichtigeAlle();
+                    beenden();
+                    return;
+                }
                 break;
         }
+
+        // Zugweitergabe testen
+        switch (zustand) {
+            case SITZUNG_A_ZUG:
+                zustand = Zustand.SITZUNG_B_ZUG;
+                benachrichtigeAlle();
+                break;
+
+            case SITZUNG_B_ZUG:
+                zustand = Zustand.SITZUNG_A_ZUG;
+                benachrichtigeAlle();
+                break;
+        }
+    }
+
+    public void beenden() {
+        zustand = Zustand.ENDE;
+        // TODO warten
+        benachrichtigeAlle();
+
+        if (sitzungA != null)
+            sitzungA.abbrechen();
+        if (sitzungB != null)
+            sitzungB.abbrechen();
     }
 
     private void benachrichtigeAlle() {
@@ -57,6 +136,8 @@ public abstract class LaufendesSpiel {
 
     public abstract boolean spielZuende();
 
+    public abstract Spieler gewinner();
+
     public abstract void benachrichtigeClients(IClient client, Spieler spieler);
 
     public abstract boolean zugGueltig(Spieler spieler, int x, int y);
@@ -70,6 +151,7 @@ public abstract class LaufendesSpiel {
         SITZUNG_B_ZUG,
         SITZUNG_A_GEWONNEN,
         SITZUNG_B_GEWONNEN,
+        UNENTSCHIEDEN,
         ENDE
     }
 
