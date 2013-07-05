@@ -1,5 +1,6 @@
 package uni.prakinf.m4.server.sitzung;
 
+import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
 
 public class LaufendesSpielChomp extends LaufendesSpiel {
@@ -24,17 +25,17 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public IClient.Spiel getSpiel() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return IClient.Spiel.CHOMP;
     }
 
     @Override
     public boolean spielZuende() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;
     }
 
     @Override
     public Spieler gewinner() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
@@ -48,9 +49,45 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
                     case WARTE_AUF_ANNAHME:
                         client.neuerZustandChomp(IClient.Zustand.ANFRAGE, spielfeld, getSpielerBName());
                         break;
+                    case SITZUNG_A_ZUG:
+                        client.neuerZustandChomp(IClient.Zustand.ZUG, spielfeld, getSpielerBName());
+                        break;
+                    case SITZUNG_B_ZUG:
+                        client.neuerZustandChomp(IClient.Zustand.WARTEN, spielfeld, getSpielerBName());
+                        break;
+                    case SITZUNG_A_GEWONNEN:
+                        client.neuerZustandChomp(IClient.Zustand.GEWONNEN, spielfeld, getSpielerBName());
+                        break;
+                    case SITZUNG_B_GEWONNEN:
+                        client.neuerZustandChomp(IClient.Zustand.VERLOREN, spielfeld, getSpielerBName());
+                        break;
+                    case UNENTSCHIEDEN:
+                        client.neuerZustandChomp(IClient.Zustand.UNENTSCHIEDEN, spielfeld, getSpielerBName());
+                        break;
                 }
                 break;
             case B:
+                switch (zustand) {
+                    case SITZUNG_A_ZUG:
+                        client.neuerZustandChomp(IClient.Zustand.WARTEN, spielfeld, getSpielerAName());
+                        break;
+                    case SITZUNG_B_ZUG:
+                        client.neuerZustandChomp(IClient.Zustand.ZUG, spielfeld, getSpielerAName());
+                        break;
+                    case SITZUNG_A_GEWONNEN:
+                        client.neuerZustandChomp(IClient.Zustand.VERLOREN, spielfeld, getSpielerAName());
+                        break;
+                    case SITZUNG_B_GEWONNEN:
+                        client.neuerZustandChomp(IClient.Zustand.GEWONNEN, spielfeld, getSpielerAName());
+                        break;
+                    case UNENTSCHIEDEN:
+                        client.neuerZustandChomp(IClient.Zustand.UNENTSCHIEDEN, spielfeld, getSpielerAName());
+                        break;
+                    case WARTE_AUF_ZWEITE_SITZUNG:
+                    case WARTE_AUF_ANNAHME:
+                        Logger.errln("LaufendesSpielChomp: Ungültiger Zustand!");
+                        break;
+                }
                 break;
         }
     }

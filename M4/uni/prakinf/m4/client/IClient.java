@@ -22,7 +22,8 @@ public interface IClient {
         WARTEN,
         GEWONNEN,
         VERLOREN,
-        ABBRUCH
+        ABBRUCH,
+        UNENTSCHIEDEN
     }
 
     public enum VierGewinntStein {

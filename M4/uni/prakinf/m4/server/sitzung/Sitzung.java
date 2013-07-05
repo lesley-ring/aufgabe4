@@ -48,7 +48,7 @@ public class Sitzung implements IClient {
 
     @Override
     public void spielZuende() {
-
+        sendeNachrichtAsync(new M4NachrichtEinfach(M4NachrichtEinfach.Methode.SRV_SPIEL_ENDE));
     }
 
     public void sitzungVerlassen() {
@@ -87,6 +87,7 @@ public class Sitzung implements IClient {
 
     public void abbrechen() {
         if (sitzungszustand == Sitzungszustand.SPIELT) {
+            Logger.errln("Sitzung: Spielabbruch gefordert.");
             if (spiel != null)
                 spiel.beenden();
             spiel = null;
@@ -119,22 +120,22 @@ public class Sitzung implements IClient {
     }
 
     public void verbindungTrennen() {
+        sitzungVerlassen();
         if(sitzungszustand==Sitzungszustand.SPIELT)
             abbrechen();
-        sitzungVerlassen();
     }
 
     // IClient Methoden - Aufruf: Nachricht weiterleiten an Client
     @Override
     public void neuerZustandChomp(Zustand zustand, boolean[][] spielfeld, String gegenspieler) {
         M4NachrichtSpielzustand m4z = new M4NachrichtSpielzustand(zustand, gegenspieler, spielfeld);
-        thread.sendeNachrichtAsync(m4z);
+        sendeNachrichtAsync(m4z);
     }
 
     @Override
     public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein[][] spielfeld, String gegenspieler) {
         M4NachrichtSpielzustand m4z = new M4NachrichtSpielzustand(zustand, gegenspieler, spielfeld);
-        thread.sendeNachrichtAsync(m4z);
+        sendeNachrichtAsync(m4z);
     }
 
     @Override
@@ -142,7 +143,7 @@ public class Sitzung implements IClient {
         M4NachrichtEinfach liste_nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.SRV_SPIELERLISTE);
         liste_nr.setLs(name);
         liste_nr.setLspiel(spiel);
-        thread.sendeNachrichtAsync(liste_nr);
+        sendeNachrichtAsync(liste_nr);
     }
 
     @Override
@@ -150,7 +151,7 @@ public class Sitzung implements IClient {
         M4NachrichtEinfach nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.SRV_NACHRICHT);
         nr.setSa(name);
         nr.setSb(nachricht);
-        thread.sendeNachrichtAsync(nr);
+        sendeNachrichtAsync(nr);
     }
 
     // Nie aufgerufene Methoden

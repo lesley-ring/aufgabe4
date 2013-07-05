@@ -24,7 +24,7 @@ public class M4ClientTest implements IClient {
         Logger.logln("M4ClientTest: Spiele Chomp.");
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(500);
         } catch (Exception x) {
 
         }
@@ -39,7 +39,8 @@ public class M4ClientTest implements IClient {
 
     @Override
     public void neuerZustandChomp(Zustand zustand, boolean[][] spielfeld, String gegenspieler) {
-        Logger.logln("M4ClientTest: Neuer uni.prakinf.m4.client.Chomp-Zustand!");
+        Logger.logln("M4ClientTest: Neuer Chomp-Zustand!");
+        Logger.logf("M4ClientTest: Zustand: %s, gegen: %s\n", zustand.toString(), gegenspieler);
     }
 
     @Override

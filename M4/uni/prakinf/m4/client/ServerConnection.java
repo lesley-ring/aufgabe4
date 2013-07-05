@@ -132,7 +132,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
 
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
-
+        M4Decoder.decodiereSpielzustand(client, spielzustand);
     }
 
     @Override
