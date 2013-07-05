@@ -96,12 +96,12 @@ public class M4TransportThread extends Thread {
         while (threadSollLaufen || (nachrichtenAusgehend.peek() != null)) {
             try {
                 if (nachrichtenAusgehend.peek() != null) {
-                    Logger.logf("M4TransportThread: Sende Nachricht\n");
+                    // Logger.logf("M4TransportThread: Sende Nachricht\n");
                     o.writeObject(nachrichtenAusgehend.take());
                 }
                 final M4Nachricht nachricht = (M4Nachricht) i.readObject();
                 if (nachricht != null) {
-                    Logger.logf("M4TransportThread: Nachricht empfangen\n");
+                    // Logger.logf("M4TransportThread: Nachricht empfangen\n");
                     synchronized (this) {
                         if (nachrichtenEinreihen && (nachricht instanceof M4NachrichtEinfach) && ((M4NachrichtEinfach) nachricht).getMethode() == nachrichtenEinreihenMethode) {
                             nachrichtenEingehend.put((M4NachrichtEinfach) nachricht);

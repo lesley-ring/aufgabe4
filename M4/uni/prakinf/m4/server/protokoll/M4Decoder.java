@@ -34,7 +34,7 @@ public class M4Decoder {
                 sitzung.antwortAufAnfrage(nachrichtEinfach.isB());
                 break;
             case CL_NACHRICHT:
-                sitzung.nachricht(nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
+                sitzung.client_nachricht(nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
                 break;
             case RET_CL_LOGIN:
             case RET_CL_MITSPIELEN:

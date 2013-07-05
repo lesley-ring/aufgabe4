@@ -14,7 +14,6 @@ public class Sitzung implements IClient {
     private M4TransportThread thread;
     private Sitzungszustand sitzungszustand;
     private LaufendesSpiel spiel;
-
     private Spiel spielTyp;
     private String sitzungName;
 
@@ -121,7 +120,7 @@ public class Sitzung implements IClient {
 
     public void verbindungTrennen() {
         sitzungVerlassen();
-        if(sitzungszustand==Sitzungszustand.SPIELT)
+        if (sitzungszustand == Sitzungszustand.SPIELT)
             abbrechen();
     }
 
@@ -148,10 +147,26 @@ public class Sitzung implements IClient {
 
     @Override
     public void nachricht(String name, String nachricht) {
+        // Nachricht von Server an Client
         M4NachrichtEinfach nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.SRV_NACHRICHT);
         nr.setSa(name);
         nr.setSb(nachricht);
         sendeNachrichtAsync(nr);
+    }
+
+    public void client_nachricht(String name, String nachricht) {
+        // Nachricht von Client an Server
+        Sitzung ziel = server.findeSitzung(name);
+        boolean zugestellt = false;
+        if (ziel != null) {
+            try {
+                ziel.nachricht(name, nachricht);
+                zugestellt = true;
+            } catch (Exception e) {
+                Logger.errln("Sitzung: Nachricht konnte nicht zugestellt werden.");
+            }
+        }
+        sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NACHRICHT, zugestellt);
     }
 
     // Nie aufgerufene Methoden
