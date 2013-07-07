@@ -122,7 +122,8 @@ public class M4TransportThread extends Thread {
             } catch (EOFException eofx) {
                 // Nichts tun!
             } catch (Exception e) {
-                annahme.verbindungsFehler(userObject, e);
+                if (threadSollLaufen)
+                    annahme.verbindungsFehler(userObject, e);
                 threadSollLaufen = false;
             }
         }
@@ -152,12 +153,16 @@ public class M4TransportThread extends Thread {
     }
 
     public M4NachrichtEinfach warteAufNachricht(M4NachrichtEinfach.Methode methode) {
+        return warteAufNachricht(methode, M4BLOCKTIME);
+    }
+
+    public M4NachrichtEinfach warteAufNachricht(M4NachrichtEinfach.Methode methode, int timeout) {
         synchronized (this) {
             nachrichtenEinreihen = true;
             nachrichtenEinreihenMethode = methode;
         }
         try {
-            M4NachrichtEinfach nachricht = nachrichtenEingehend.poll(M4BLOCKTIME, TimeUnit.MILLISECONDS);
+            M4NachrichtEinfach nachricht = nachrichtenEingehend.poll(timeout, TimeUnit.MILLISECONDS);
             synchronized (this) {
                 nachrichtenEinreihen = false;
             }

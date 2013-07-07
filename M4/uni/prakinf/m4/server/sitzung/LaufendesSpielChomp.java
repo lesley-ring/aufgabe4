@@ -6,11 +6,14 @@ import uni.prakinf.m4.client.IClient;
 public class LaufendesSpielChomp extends LaufendesSpiel {
     private Spieler gewinner;
     private boolean[][] spielfeld;
+    private int sgx, sgy;
 
     public LaufendesSpielChomp(Sitzung sitzungA, int x, int y) {
         super(sitzungA);
         gewinner = null;
         spielfeld = new boolean[x][y];
+        sgx = x;
+        sgy = y;
     }
 
     private void spielfeldVorbereiten() {
@@ -84,8 +87,10 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
                         client.neuerZustandChomp(IClient.Zustand.UNENTSCHIEDEN, spielfeld, getSpielerAName());
                         break;
                     case WARTE_AUF_ZWEITE_SITZUNG:
-                    case WARTE_AUF_ANNAHME:
                         Logger.errln("LaufendesSpielChomp: Ungültiger Zustand!");
+                        break;
+                    case WARTE_AUF_ANNAHME:
+                        // Keine Nachricht!
                         break;
                 }
                 break;
@@ -94,7 +99,7 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public boolean zugGueltig(Spieler spieler, int x, int y) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

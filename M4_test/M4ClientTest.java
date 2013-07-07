@@ -3,65 +3,57 @@ import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.client.IServerConnection;
 import uni.prakinf.m4.client.ServerConnection;
 
-public class M4ClientTest implements IClient {
+public class M4ClientTest {
+    IServerConnection serverConnectionA, serverConnectionB;
     public void los() {
-        IServerConnection serverConnectionA = new ServerConnection();
-        serverConnectionA.setClient(this);
+        serverConnectionA = new ServerConnection();
+        serverConnectionA.setClient(new GameTester(serverConnectionA));
         Logger.logln("M4ClientTest: Anmeldung A...");
         if (!serverConnectionA.login("localhost", "Clemens", "test")) {
-            Logger.logln("M4ClientTest: Fehler!");
+            Logger.logln("M4ClientTest: Anmeldung A fehlgeschlagen");
             serverConnectionA.verbindungTrennen();
             return;
         } else
             Logger.logln("M4ClientTest: Anmeldung A okay!");
 
-        if (!serverConnectionA.neuesSpiel(Spiel.CHOMP, 5, 7)) {
+        if (!serverConnectionA.neuesSpiel(IClient.Spiel.CHOMP, 5, 7)) {
             Logger.errln("Kann kein neues Spiel erstellen!");
             serverConnectionA.verbindungTrennen();
             return;
         }
 
-        Logger.logln("M4ClientTest: Spiele Chomp.");
+        Logger.logln("M4ClientTest: Spiel erstellt.");
+
+        serverConnectionB = new ServerConnection();
+        serverConnectionB.setClient(new GameTester(serverConnectionB));
+        Logger.logln("M4ClientTest: Anmeldung B...");
+        if (!serverConnectionB.login("localhost", "Paul", "test")) {
+            Logger.errln("M4ClientTest: Anmeldung B fehlgeschlagen.");
+            serverConnectionA.verbindungTrennen();
+            serverConnectionB.verbindungTrennen();
+            return;
+        }
+        else
+            Logger.logln("M4ClientTest: Anmeldung B okay!");
+
+        if(!serverConnectionB.mitspielen("Clemens", IClient.Spiel.CHOMP)) {
+            Logger.errln("M4ClientTest: Mitspielen gescheitert.");
+        }
 
         try {
-            Thread.sleep(500);
+            Thread.sleep(2000);
         } catch (Exception x) {
 
         }
 
         serverConnectionA.verbindungTrennen();
-    }
 
-    @Override
-    public void verbindungsFehler() {
-        Logger.logln("M4ClientTest: Verbindungsfehler!");
-    }
+        try {
+            Thread.sleep(2000);
+        } catch (Exception x) {
 
-    @Override
-    public void neuerZustandChomp(Zustand zustand, boolean[][] spielfeld, String gegenspieler) {
-        Logger.logln("M4ClientTest: Neuer Chomp-Zustand!");
-        Logger.logf("M4ClientTest: Zustand: %s, gegen: %s\n", zustand.toString(), gegenspieler);
-    }
+        }
 
-    @Override
-    public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein[][] spielfeld, String gegenspieler) {
-        Logger.logln("M4ClientTest: Neuer Vier Gewinnt-Zustand!");
-    }
-
-    @Override
-    public void spielerListe(String[] name, Spiel[] spiel) {
-        Logger.logln("M4ClientTest: Spieler: ");
-        for (String sname : name)
-            Logger.logln("              " + sname);
-    }
-
-    @Override
-    public void nachricht(String name, String nachricht) {
-        Logger.logf("M4ClientTest: Neue Nachricht von %s: %s\n", name, nachricht);
-    }
-
-    @Override
-    public void spielZuende() {
-        Logger.logln("M4ClientTest: Spiel zuende!");
+        serverConnectionB.verbindungTrennen();
     }
 }

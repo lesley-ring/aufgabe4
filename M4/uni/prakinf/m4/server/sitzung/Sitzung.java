@@ -30,6 +30,10 @@ public class Sitzung implements IClient {
         return spielTyp;
     }
 
+    public LaufendesSpiel getSpiel() {
+        return spiel;
+    }
+
     public M4TransportThread getThread() {
         return thread;
     }
@@ -47,11 +51,19 @@ public class Sitzung implements IClient {
 
     @Override
     public void spielZuende() {
+        if(sitzungszustand == Sitzungszustand.SPIELT) {
+            spiel = null;
+            spielTyp = Spiel.KEINS;
+            sitzungszustand = Sitzungszustand.ANGEMELDET;
+
+            server.sitzungenVerteilen();
+        }
         sendeNachrichtAsync(new M4NachrichtEinfach(M4NachrichtEinfach.Methode.SRV_SPIEL_ENDE));
     }
 
     public void sitzungVerlassen() {
         try {
+            sitzungszustand = Sitzungszustand.VERBUNDEN;
             server.entferne(this, getThread());
             thread.abbruch();
         } catch (Exception ex) {
@@ -77,11 +89,20 @@ public class Sitzung implements IClient {
     }
 
     public void antwortAufAnfrage(boolean ok) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (sitzungszustand == Sitzungszustand.SPIELT) {
+            spiel.antwortAufAnfrage(this, ok);
+        } else {
+            Logger.errln("Sitzung: Antwort ohne Anfrage!");
+        }
     }
 
-    public boolean zug(int x, int y) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public void zug(int x, int y) {
+        if(sitzungszustand == Sitzungszustand.SPIELT) {
+            spiel.zug(this, x, y);
+        } else {
+            Logger.errln("Sitzung: Zug nicht erlaubt, kein Spiel!");
+            sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_ZUG, false);
+        }
     }
 
     public void abbrechen() {
@@ -112,10 +133,18 @@ public class Sitzung implements IClient {
                 sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
                 break;
         }
+        server.sitzungenVerteilen();
     }
 
     public void mitspielen(String name, Spiel spiel) {
-
+        Sitzung sitzungA = server.findeSitzung(name);
+        if(sitzungA != null && sitzungA.getSpielTyp() == spiel) {
+            // Richtige Sitzung, richtiges Spiel
+            LaufendesSpiel ls = sitzungA.getSpiel();
+            ls.zweiteSitzung(this);
+        } else {
+            sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
+        }
     }
 
     public void verbindungTrennen() {

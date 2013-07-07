@@ -89,7 +89,7 @@ public class Server implements M4Annahme {
 
         new Thread() {
             public void run() {
-                Logger.logf("Server: Verteile %d Sitzungen...\n", sessions.size());
+                // Logger.logf("Server: Verteile %d Sitzungen...\n", sessions.size());
                 for (Sitzung sitzung : sessions) {
                     try {
                         sitzung.spielerListe(anames, agames);
@@ -97,7 +97,7 @@ public class Server implements M4Annahme {
                         Logger.errf("Server: Fehler bei Sitzungsverteilung: %s\n", e.getMessage());
                     }
                 }
-                Logger.logln("Server: Sitzungsverteilung fertig.");
+                // Logger.logln("Server: Sitzungsverteilung fertig.");
             }
         }.start();
     }

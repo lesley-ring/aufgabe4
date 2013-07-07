@@ -16,14 +16,14 @@ public abstract class LaufendesSpiel {
         zustand = Zustand.WARTE_AUF_ZWEITE_SITZUNG;
     }
 
-    public String getSpielerAName () {
-        if(sitzungA != null)
+    public String getSpielerAName() {
+        if (sitzungA != null)
             return sitzungA.getSitzungName();
         return "";
     }
 
-    public String getSpielerBName () {
-        if(sitzungB != null)
+    public String getSpielerBName() {
+        if (sitzungB != null)
             return sitzungB.getSitzungName();
         return "";
     }
@@ -95,15 +95,19 @@ public abstract class LaufendesSpiel {
             case SITZUNG_A_ZUG:
             case SITZUNG_B_ZUG:
                 if (spielZuende()) {
-                    switch (gewinner()) {
-                        case A:
-                            zustand = Zustand.SITZUNG_A_GEWONNEN;
-                            break;
-                        case B:
-                            zustand = Zustand.SITZUNG_B_GEWONNEN;
-                            break;
-                        default:
-                            zustand = Zustand.UNENTSCHIEDEN;
+                    Spieler gewinner = gewinner();
+                    if (gewinner != null) {
+                        switch (gewinner()) {
+                            case A:
+                                zustand = Zustand.SITZUNG_A_GEWONNEN;
+                                break;
+                            case B:
+                                zustand = Zustand.SITZUNG_B_GEWONNEN;
+                                break;
+
+                        }
+                    } else {
+                        zustand = Zustand.UNENTSCHIEDEN;
                     }
                     benachrichtigeAlle();
                     beenden();

@@ -68,6 +68,10 @@ public class ServerConnection implements IServerConnection, M4Annahme {
     }
 
     public boolean zug(int x, int y) {
+        if(verbindungszustand == Verbindungszustand.GETRENNT) {
+            client.verbindungsFehler();
+            return false;
+        }
         M4NachrichtEinfach zug = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_ZUG);
         zug.setIa(x);
         zug.setIb(y);
@@ -112,7 +116,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
         thread.sendeNachrichtAsync(ms);
 
         // Antwort abwarten
-        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN);
+        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, M4TransportThread.M4BLOCKTIME * 3);
 
         if (antwort != null) {
             return antwort.isB();
@@ -127,6 +131,8 @@ public class ServerConnection implements IServerConnection, M4Annahme {
     // M4Annahme Methoden
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtEinfach nachrichtEinfach) {
+        if(nachrichtEinfach != null && nachrichtEinfach.getMethode() == M4NachrichtEinfach.Methode.SRV_SPIEL_ENDE && verbindungszustand == Verbindungszustand.SPIELT)
+            verbindungszustand = Verbindungszustand.ANGEMELDET;
         M4Decoder.decodiereServerNachricht(client, nachrichtEinfach);
     }
 
