@@ -63,6 +63,9 @@ public class Sitzung implements IClient {
 
     public void sitzungVerlassen() {
         try {
+            if(sitzungszustand == Sitzungszustand.SPIELT) {
+                abbrechen();
+            }
             sitzungszustand = Sitzungszustand.VERBUNDEN;
             server.entferne(this, getThread());
             thread.abbruch();

@@ -14,6 +14,7 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
         spielfeld = new boolean[x][y];
         sgx = x;
         sgy = y;
+        spielfeldVorbereiten();
     }
 
     private void spielfeldVorbereiten() {
@@ -33,12 +34,12 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public boolean spielZuende() {
-        return true;
+        return !spielfeld[0][0];
     }
 
     @Override
     public Spieler gewinner() {
-        return null;
+        return gewinner;
     }
 
     @Override
@@ -99,11 +100,16 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public boolean zugGueltig(Spieler spieler, int x, int y) {
-        return true;  //To change body of implemented methods use File | Settings | File Templates.
+        if(x < sgx && y < sgy && x >= 0 && y >= 0)
+            return spielfeld[x][y];
+        else
+            return false;
     }
 
     @Override
     public void setzeZug(Spieler spieler, int x, int y) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(; x < sgx; x++)
+            for(; y < sgy; y++)
+                spielfeld[x][y] = false;
     }
 }

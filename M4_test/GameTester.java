@@ -34,11 +34,12 @@ public class GameTester implements IClient {
             case ZUG:
                 int rx = new Random().nextInt(x);
                 int ry = new Random().nextInt(y);
-                if (!serverConn.zug(rx, ry)) {
-                    Logger.errln("GameTester: Zug ungültig");
-                } else {
-                    Logger.logln("GameTester: Zug ausgeführt.");
-                    serverConn.verbindungTrennen();
+                while(!serverConn.zug(rx, ry)){
+                    try {
+                        Thread.sleep(300);
+                    } catch (Exception e) {
+
+                    }
                 }
                 break;
             case WARTEN:
@@ -65,5 +66,6 @@ public class GameTester implements IClient {
     @Override
     public void spielZuende() {
         Logger.logln("GameTester: Spiel zuende");
+        serverConn.verbindungTrennen();
     }
 }

@@ -10,7 +10,7 @@ public class M4TestApp {
         }
         new M4ClientTest().los();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(10000);
         } catch (Exception e) {
         }
         server.stopServer();

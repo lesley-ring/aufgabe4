@@ -40,7 +40,7 @@ public class M4ClientTest {
             Logger.errln("M4ClientTest: Mitspielen gescheitert.");
         }
 
-        try {
+        /*try {
             Thread.sleep(2000);
         } catch (Exception x) {
 
@@ -54,6 +54,6 @@ public class M4ClientTest {
 
         }
 
-        serverConnectionB.verbindungTrennen();
+        serverConnectionB.verbindungTrennen();*/
     }
 }
