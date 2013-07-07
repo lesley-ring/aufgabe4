@@ -114,6 +114,12 @@ public abstract class LaufendesSpiel {
                         zustand = Zustand.UNENTSCHIEDEN;
                     }
                     benachrichtigeAlle();
+
+                    try {
+                        Thread.sleep(4000);
+                    } catch (Exception e) {
+
+                    }
                     beenden();
                     return;
                 }

@@ -126,7 +126,7 @@ public class Sitzung implements IClient {
     }
 
     public void neuesSpiel(Spiel spielart, int x, int y) {
-        if (sitzungszustand != Sitzungszustand.ANGEMELDET)
+        if (sitzungszustand != Sitzungszustand.ANGEMELDET || (x < 1) || (y < 1) || ((x*y) < 2) )
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
         switch (spielart) {
             case CHOMP:
@@ -137,7 +137,11 @@ public class Sitzung implements IClient {
                 spiel.los();
                 break;
             case VIER_GEWINNT:
-                sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
+                spiel = new LaufendesSpielVierGewinnt(this, x, y);
+                sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, true);
+                sitzungszustand = Sitzungszustand.SPIELT;
+                spielTyp = Spiel.VIER_GEWINNT;
+                spiel.los();
                 break;
         }
         server.sitzungenVerteilen();
@@ -153,6 +157,7 @@ public class Sitzung implements IClient {
         if (sitzungA != null && sitzungA.getSpielTyp() == spiel && !name.equals(getSitzungName()) && sitzungA.getSpiel().istFrei()) {
             // Richtige Sitzung, richtiges Spiel
             sitzungszustand = Sitzungszustand.SPIELT;
+            this.spielTyp = spiel;
             this.spiel = sitzungA.getSpiel();
             server.sitzungenVerteilen();
 
