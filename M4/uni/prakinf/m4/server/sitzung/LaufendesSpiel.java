@@ -35,6 +35,10 @@ public abstract class LaufendesSpiel {
             Logger.errf("LaufendesSpiel: Falscher Zustand!\n");
     }
 
+    public boolean istFrei() {
+        return zustand == Zustand.WARTE_AUF_ZWEITE_SITZUNG;
+    }
+
     public void zweiteSitzung(Sitzung sitzungB) {
         // TODO Timer?
         if (zustand == Zustand.WARTE_AUF_ZWEITE_SITZUNG) {

@@ -34,12 +34,13 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public boolean spielZuende() {
-        for (int x = 0; x < sgx; x++)
-            for (int y = 0; y < sgx; y++) {
-                if((x>0 || y >0) && spielfeld[x][y])
+        for (int x = 0; x < sgx; x++) {
+            for (int y = 0; y < sgy; y++) {
+                if((x>0 || y >0) && spielfeld[x][y]) {
                     return false;
-
+                }
             }
+        }
         return true;
     }
 
@@ -114,9 +115,11 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public void setzeZug(Spieler spieler, int x, int y) {
-        for(; x < sgx; x++)
-            for(; y < sgy; y++)
-                spielfeld[x][y] = false;
+        for(int fx = x; fx < sgx; fx++) {
+            for(int fy = y; fy < sgy; fy++) {
+                spielfeld[fx][fy] = false;
+            }
+        }
         gewinner = spieler;
     }
 }

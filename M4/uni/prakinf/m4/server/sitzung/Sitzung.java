@@ -150,13 +150,13 @@ public class Sitzung implements IClient {
         }
 
         Sitzung sitzungA = server.findeSitzung(name);
-        if (sitzungA != null && sitzungA.getSpielTyp() == spiel && !name.equals(getSitzungName())) {
+        if (sitzungA != null && sitzungA.getSpielTyp() == spiel && !name.equals(getSitzungName()) && sitzungA.getSpiel().istFrei()) {
             // Richtige Sitzung, richtiges Spiel
             sitzungszustand = Sitzungszustand.SPIELT;
             this.spiel = sitzungA.getSpiel();
-            this.spiel.zweiteSitzung(this);
-
             server.sitzungenVerteilen();
+
+            this.spiel.zweiteSitzung(this);
         } else {
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
         }

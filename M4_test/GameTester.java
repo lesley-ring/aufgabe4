@@ -43,7 +43,7 @@ public class GameTester implements IClient {
                         }
                     }
                 if (!serverConn.zug(rx, ry)) {
-                    Logger.errln("GameTester: Zug ungülitg!");
+                    Logger.errln("GameTester: Zug ungültig!");
                     serverConn.abbrechen();
                 }
                 break;
