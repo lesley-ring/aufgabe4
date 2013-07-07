@@ -51,7 +51,7 @@ public class Sitzung implements IClient {
 
     @Override
     public void spielZuende() {
-        if(sitzungszustand == Sitzungszustand.SPIELT) {
+        if (sitzungszustand == Sitzungszustand.SPIELT) {
             spiel = null;
             spielTyp = Spiel.KEINS;
             sitzungszustand = Sitzungszustand.ANGEMELDET;
@@ -63,7 +63,7 @@ public class Sitzung implements IClient {
 
     public void sitzungVerlassen() {
         try {
-            if(sitzungszustand == Sitzungszustand.SPIELT) {
+            if (sitzungszustand == Sitzungszustand.SPIELT) {
                 abbrechen();
             }
             sitzungszustand = Sitzungszustand.VERBUNDEN;
@@ -84,8 +84,10 @@ public class Sitzung implements IClient {
             }
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_LOGIN, result);
 
-            if (result)
+            if (result) {
                 server.sitzungenVerteilen();
+                nachricht("Server", "Willkommen auf dem Server!");
+            }
         } else
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_LOGIN, false);
 
@@ -100,7 +102,7 @@ public class Sitzung implements IClient {
     }
 
     public void zug(int x, int y) {
-        if(sitzungszustand == Sitzungszustand.SPIELT) {
+        if (sitzungszustand == Sitzungszustand.SPIELT) {
             spiel.zug(this, x, y);
         } else {
             Logger.errln("Sitzung: Zug nicht erlaubt, kein Spiel!");
@@ -116,6 +118,8 @@ public class Sitzung implements IClient {
             spiel = null;
             sitzungszustand = Sitzungszustand.ANGEMELDET;
             spielTyp = Spiel.KEINS;
+
+            server.sitzungenVerteilen();
         } else {
             Logger.errln("Sitzung: Abbruch nicht erlaubt!");
         }
@@ -140,11 +144,19 @@ public class Sitzung implements IClient {
     }
 
     public void mitspielen(String name, Spiel spiel) {
+        if (sitzungszustand != Sitzungszustand.ANGEMELDET) {
+            sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
+            return;
+        }
+
         Sitzung sitzungA = server.findeSitzung(name);
-        if(sitzungA != null && sitzungA.getSpielTyp() == spiel) {
+        if (sitzungA != null && sitzungA.getSpielTyp() == spiel && !name.equals(getSitzungName())) {
             // Richtige Sitzung, richtiges Spiel
-            LaufendesSpiel ls = sitzungA.getSpiel();
-            ls.zweiteSitzung(this);
+            sitzungszustand = Sitzungszustand.SPIELT;
+            this.spiel = sitzungA.getSpiel();
+            this.spiel.zweiteSitzung(this);
+
+            server.sitzungenVerteilen();
         } else {
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
         }
@@ -159,6 +171,10 @@ public class Sitzung implements IClient {
     // IClient Methoden - Aufruf: Nachricht weiterleiten an Client
     @Override
     public void neuerZustandChomp(Zustand zustand, boolean[][] spielfeld, String gegenspieler) {
+        /*System.out.println("Server: Spielfeld:");
+        System.out.printf("Server: %b %b %b\n", spielfeld[0][1], spielfeld[0][0], spielfeld[0][2]);
+        System.out.printf("Server: %b %b %b\n", spielfeld[1][1], spielfeld[1][0], spielfeld[1][2]);
+        System.out.printf("Server: %b %b %b\n", spielfeld[2][1], spielfeld[2][0], spielfeld[2][2]);*/
         M4NachrichtSpielzustand m4z = new M4NachrichtSpielzustand(zustand, gegenspieler, spielfeld);
         sendeNachrichtAsync(m4z);
     }
@@ -188,15 +204,27 @@ public class Sitzung implements IClient {
 
     public void client_nachricht(String name, String nachricht) {
         // Nachricht von Client an Server
-        Sitzung ziel = server.findeSitzung(name);
         boolean zugestellt = false;
-        if (ziel != null) {
+        if (name.isEmpty()) {
             try {
-                ziel.nachricht(name, nachricht);
+                server.nachrichtAnAlle(getSitzungName(), nachricht);
                 zugestellt = true;
             } catch (Exception e) {
-                Logger.errln("Sitzung: Nachricht konnte nicht zugestellt werden.");
+                Logger.errln("Sitzung: Massennachricht konnte nicht zugestellt werden.");
             }
+        } else {
+            Sitzung ziel = server.findeSitzung(name);
+
+            if (ziel != null) {
+                try {
+                    ziel.nachricht(getSitzungName(), nachricht);
+                    zugestellt = true;
+                } catch (Exception e) {
+                    Logger.errln("Sitzung: Nachricht konnte nicht zugestellt werden.");
+                }
+
+            }
+
         }
         sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NACHRICHT, zugestellt);
     }

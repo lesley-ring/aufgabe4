@@ -84,6 +84,10 @@ public class M4Decoder {
 
         switch (nachrichtSpielzustand.getSpiel()) {
             case CHOMP:
+                /*System.out.println("Client: Spielfeld:");
+                System.out.printf("Client: %b %b %b\n", nachrichtSpielzustand.getSpielfeldChomp()[0][1], nachrichtSpielzustand.getSpielfeldChomp()[0][0], nachrichtSpielzustand.getSpielfeldChomp()[0][2]);
+                System.out.printf("Client: %b %b %b\n", nachrichtSpielzustand.getSpielfeldChomp()[1][1], nachrichtSpielzustand.getSpielfeldChomp()[1][0], nachrichtSpielzustand.getSpielfeldChomp()[1][2]);
+                System.out.printf("Client: %b %b %b\n", nachrichtSpielzustand.getSpielfeldChomp()[2][1], nachrichtSpielzustand.getSpielfeldChomp()[2][0], nachrichtSpielzustand.getSpielfeldChomp()[2][2]);*/
                 client.neuerZustandChomp(nachrichtSpielzustand.getZustand(), nachrichtSpielzustand.getSpielfeldChomp(), nachrichtSpielzustand.getGegenSpieler());
                 break;
             case VIER_GEWINNT:

@@ -124,8 +124,19 @@ public class ServerConnection implements IServerConnection, M4Annahme {
         return false;
     }
 
-    public void nachricht(String name, String nachricht) {
+    public boolean nachricht(String name, String nachricht) {
+        M4NachrichtEinfach nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.CL_NACHRICHT);
+        nr.setSa(name);
+        nr.setSb(nachricht);
+        thread.sendeNachrichtAsync(nr);
 
+        // Antwort abwarten
+        M4NachrichtEinfach antwort = thread.warteAufNachricht(M4NachrichtEinfach.Methode.RET_CL_NACHRICHT, M4TransportThread.M4BLOCKTIME);
+
+        if (antwort != null) {
+            return antwort.isB();
+        }
+        return false;
     }
 
     // M4Annahme Methoden
@@ -143,7 +154,9 @@ public class ServerConnection implements IServerConnection, M4Annahme {
 
     @Override
     public void verbindungsFehler(Object userObject, Exception exception) {
-        switch (verbindungszustand) {
+        Verbindungszustand a = verbindungszustand;
+        verbindungszustand = Verbindungszustand.GETRENNT;
+        switch (a) {
             case SPIELT:
             case ANGEMELDET:
                 client.verbindungsFehler();
@@ -153,7 +166,7 @@ public class ServerConnection implements IServerConnection, M4Annahme {
                 Logger.logf("ServerConnection: Verbindungsfehler (%s)\n", exception.getMessage());
                 break;
         }
-        verbindungszustand = Verbindungszustand.GETRENNT;
+
     }
 
     @Override

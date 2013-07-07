@@ -17,10 +17,13 @@ public class Server implements M4Annahme {
     private List<Sitzung> sitzungen;
     private VerbindungsThread vthread;
 
-
     public Server() {
         threads = new LinkedList<M4TransportThread>();
         sitzungen = new LinkedList<Sitzung>();
+    }
+
+    public static void main(String[] args) {
+        new Server().startServer();
     }
 
     public void startServer() {
@@ -71,13 +74,37 @@ public class Server implements M4Annahme {
         return null;
     }
 
+    public void nachrichtAnAlle(final String name, final String message) {
+        final ArrayList<Sitzung> sessions = new ArrayList<Sitzung>();
+        synchronized (sitzungen) {
+            for (Sitzung sitzung : sitzungen)
+                if (sitzung.getSitzungName() != "" && sitzung.getSitzungName() != null) {
+                    sessions.add(sitzung);
+                }
+        }
+
+        new Thread() {
+            public void run() {
+                // Logger.logf("Server: Verteile %d Sitzungen...\n", sessions.size());
+                for (Sitzung sitzung : sessions) {
+                    try {
+                        sitzung.nachricht(name, message);
+                    } catch (Exception e) {
+                        Logger.errf("Server: Fehler bei Nachrichtenübetragung: %s\n", e.getMessage());
+                    }
+                }
+                // Logger.logln("Server: Sitzungsverteilung fertig.");
+            }
+        }.start();
+    }
+
     public void sitzungenVerteilen() {
         ArrayList<String> names = new ArrayList<String>();
         ArrayList<IClient.Spiel> games = new ArrayList<IClient.Spiel>();
         final ArrayList<Sitzung> sessions = new ArrayList<Sitzung>();
         synchronized (sitzungen) {
-            for (Sitzung sitzung: sitzungen)
-                if(sitzung.getSitzungName() != "" && sitzung.getSitzungName() != null) {
+            for (Sitzung sitzung : sitzungen)
+                if (sitzung.getSitzungName() != "" && sitzung.getSitzungName() != null) {
                     names.add(sitzung.getSitzungName());
                     games.add(sitzung.getSpielTyp());
                     sessions.add(sitzung);
@@ -130,8 +157,8 @@ public class Server implements M4Annahme {
 
     public boolean istAngemeldet(String name) {
         synchronized (sitzungen) {
-            for(Sitzung sitzung : sitzungen)
-                if(sitzung.getSitzungName()!= null && sitzung.getSitzungName().equals(name))
+            for (Sitzung sitzung : sitzungen)
+                if (sitzung.getSitzungName() != null && sitzung.getSitzungName().equals(name))
                     return true;
         }
         return false;

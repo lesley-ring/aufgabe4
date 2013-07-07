@@ -16,7 +16,7 @@ public class M4ClientTest {
         } else
             Logger.logln("M4ClientTest: Anmeldung A okay!");
 
-        if (!serverConnectionA.neuesSpiel(IClient.Spiel.CHOMP, 5, 7)) {
+        if (!serverConnectionA.neuesSpiel(IClient.Spiel.CHOMP, 3, 5)) {
             Logger.errln("Kann kein neues Spiel erstellen!");
             serverConnectionA.verbindungTrennen();
             return;

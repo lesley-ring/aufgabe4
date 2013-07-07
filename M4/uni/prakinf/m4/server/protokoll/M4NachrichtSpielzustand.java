@@ -26,7 +26,10 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
         this.zustand = zustand;
         this.gegenSpieler = gegenSpieler;
         this.spiel = IClient.Spiel.CHOMP;
-        this.spielfeldChomp = spielfeld;
+        this.spielfeldChomp = new boolean[spielfeld.length][spielfeld[0].length];
+        for(int x = 0; x < spielfeld.length; x++)
+            for(int y = 0; y < spielfeld[0].length; y++)
+                spielfeldChomp[x][y] = spielfeld[x][y];
         this.spielfeldVierGewinnt = null;
         this.spielfeldGueltig = (spielfeld != null);
     }
@@ -42,7 +45,10 @@ public class M4NachrichtSpielzustand extends M4Nachricht implements Serializable
         this.zustand = zustand;
         this.gegenSpieler = gegenSpieler;
         this.spiel = IClient.Spiel.VIER_GEWINNT;
-        this.spielfeldVierGewinnt = spielfeld;
+        this.spielfeldVierGewinnt = new IClient.VierGewinntStein[spielfeld.length][spielfeld[0].length];
+        for(int x = 0; x < spielfeld.length; x++)
+            for(int y = 0; y < spielfeld[0].length; y++)
+                spielfeldVierGewinnt[x][y] = spielfeld[x][y];
         this.spielfeldChomp = null;
         this.spielfeldGueltig = (spielfeld != null);
     }

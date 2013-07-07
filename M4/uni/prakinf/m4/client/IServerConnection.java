@@ -49,7 +49,7 @@ public interface IServerConnection {
     /**
      * Sendet eine Nachricht "nachricht" an den uni.prakinf.m4.client.Spieler "name".
      */
-    public void nachricht(String name, String nachricht);
+    public boolean nachricht(String name, String nachricht);
 
     /**
      * Trennt die Verbindung zum Server

@@ -34,7 +34,13 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
 
     @Override
     public boolean spielZuende() {
-        return !spielfeld[0][0];
+        for (int x = 0; x < sgx; x++)
+            for (int y = 0; y < sgx; y++) {
+                if((x>0 || y >0) && spielfeld[x][y])
+                    return false;
+
+            }
+        return true;
     }
 
     @Override
@@ -111,5 +117,6 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
         for(; x < sgx; x++)
             for(; y < sgy; y++)
                 spielfeld[x][y] = false;
+        gewinner = spieler;
     }
 }

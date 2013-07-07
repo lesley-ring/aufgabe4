@@ -2,8 +2,6 @@ import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
 import uni.prakinf.m4.client.IServerConnection;
 
-import java.util.Random;
-
 public class GameTester implements IClient {
     private IServerConnection serverConn;
 
@@ -32,14 +30,21 @@ public class GameTester implements IClient {
                 serverConn.antwortAufAnfrage(true);
                 break;
             case ZUG:
-                int rx = new Random().nextInt(x);
-                int ry = new Random().nextInt(y);
-                while(!serverConn.zug(rx, ry)){
-                    try {
-                        Thread.sleep(300);
-                    } catch (Exception e) {
+                int rx = 0;
+                int ry = 0;
 
+                for (int px = x - 1; px >= 0; px--)
+                    for (int py = y - 1; py >= 0; py--) {
+                        if (spielfeld[px][py]) {
+                            rx = px;
+                            ry = py;
+                            px = -1;
+                            py = -1;
+                        }
                     }
+                if (!serverConn.zug(rx, ry)) {
+                    Logger.errln("GameTester: Zug ungülitg!");
+                    serverConn.abbrechen();
                 }
                 break;
             case WARTEN:
