@@ -89,10 +89,9 @@ public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
             int acount = 0;
             for (int y = 0; y < sgy; y++) {
                 int rx = ax + y;
-                int ry = y;
 
-                if (rx >= 0 && rx < sgx && ry >= 0 && ry < sgy) {
-                    if (spielfeld[rx][ry] == spieler) {
+                if (rx >= 0 && rx < sgx && y >= 0 && y < sgy) {
+                    if (spielfeld[rx][y] == spieler) {
                         acount++;
                         if (acount == 4)
                             return true;
@@ -206,10 +205,7 @@ public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
 
     @Override
     public boolean zugGueltig(LaufendesSpiel.Spieler spieler, int x, int y) {
-        if (y != 0)
-            return false;
-
-        return spielfeld[x][y] == null;
+        return y == 0 && spielfeld[x][y] == null;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class Server implements M4Annahme {
         final ArrayList<Sitzung> sessions = new ArrayList<Sitzung>();
         synchronized (sitzungen) {
             for (Sitzung sitzung : sitzungen)
-                if (sitzung.getSitzungName() != "" && sitzung.getSitzungName() != null) {
+                if (sitzung.getSitzungName() != null && !sitzung.getSitzungName().isEmpty()) {
                     sessions.add(sitzung);
                 }
         }
@@ -104,7 +104,7 @@ public class Server implements M4Annahme {
         final ArrayList<Sitzung> sessions = new ArrayList<Sitzung>();
         synchronized (sitzungen) {
             for (Sitzung sitzung : sitzungen)
-                if (sitzung.getSitzungName() != "" && sitzung.getSitzungName() != null) {
+                if (sitzung.getSitzungName() != null && !sitzung.getSitzungName().isEmpty()) {
                     names.add(sitzung.getSitzungName());
                     games.add(sitzung.getSpielTyp());
                     sessions.add(sitzung);
