@@ -141,7 +141,7 @@ public class Server implements M4Annahme {
     @Override
     public void verarbeiteNachricht(Object userObject, M4NachrichtSpielzustand spielzustand) {
         // Sollte nie aufgerufen werden, da diese Nachrichten vom Client kommen!
-        Logger.errf("Server: Fehlerhafte Nachricht vom Client (Spielzustand), ignoriert\n");
+        Logger.errln("Server: Fehlerhafte Nachricht vom Client (Spielzustand), ignoriert");
     }
 
     @Override

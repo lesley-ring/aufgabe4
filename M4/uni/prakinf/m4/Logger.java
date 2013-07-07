@@ -15,9 +15,20 @@ public class Logger {
         tse();
         System.err.println(s);
     }
-    public static void errf(String s, String... strings) {
+
+    public static void errf(String s, String stringa) {
         tse();
-        System.err.printf(s, strings);
+        System.err.printf(s, stringa);
+    }
+
+    public static void errf(String s, String stringa, String stringb) {
+        tse();
+        System.err.printf(s, stringa, stringb);
+    }
+
+    public static void errf(String s, String stringa, String stringb, String stringc) {
+        tse();
+        System.err.printf(s, stringa, stringb, stringc);
     }
 
     public static void logln(String s) {

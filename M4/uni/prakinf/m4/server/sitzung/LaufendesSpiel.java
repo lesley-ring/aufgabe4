@@ -32,7 +32,7 @@ public abstract class LaufendesSpiel {
         if (zustand == Zustand.WARTE_AUF_ZWEITE_SITZUNG)
             benachrichtigeClients(sitzungA, Spieler.A);
         else
-            Logger.errf("LaufendesSpiel: Falscher Zustand!\n");
+            Logger.errln("LaufendesSpiel: Falscher Zustand!");
     }
 
     public boolean istFrei() {
@@ -47,7 +47,7 @@ public abstract class LaufendesSpiel {
             benachrichtigeAlle();
         } else {
             sitzungB.sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_MITSPIELEN, false);
-            Logger.errf("LaufendesSpiel: Falscher Zustand!\n");
+            Logger.errln("LaufendesSpiel: Falscher Zustand!");
         }
 
     }

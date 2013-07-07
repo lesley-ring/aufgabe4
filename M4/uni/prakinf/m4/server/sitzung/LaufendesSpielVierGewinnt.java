@@ -48,7 +48,11 @@ public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
     }
 
     private boolean unentschieden() {
-        return false;
+        for (int x = 0; x < sgx; x++)
+            for (int y = 0; y < sgy; y++)
+                if (spielfeld[x][y] == null)
+                    return false;
+        return true;
     }
 
     private boolean hatSpielerGewonnen(Spieler spieler) {
@@ -101,7 +105,7 @@ public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
         }
 
         // Diagonalen X+Y-
-        for (int ax = 0 - (sgy -1); ax < (sgx + (sgy - 1)); ax++) {
+        for (int ax = 0 - (sgy - 1); ax < (sgx + (sgy - 1)); ax++) {
             int acount = 0;
             for (int y = 0; y < sgy; y++) {
                 int rx = ax + y;
