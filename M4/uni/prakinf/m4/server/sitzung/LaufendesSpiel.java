@@ -120,7 +120,10 @@ public abstract class LaufendesSpiel {
                     } catch (Exception e) {
 
                     }
-                    beenden();
+                    if (sitzungA != null)
+                        sitzungA.spielZuende();
+                    if (sitzungB != null)
+                        sitzungB.spielZuende();
                     return;
                 }
                 break;
@@ -141,6 +144,15 @@ public abstract class LaufendesSpiel {
     }
 
     public void beenden() {
+        zustand = Zustand.ABBRUCH;
+        benachrichtigeAlle();
+
+        try {
+            Thread.sleep(4000);
+        } catch (Exception e) {
+
+        }
+
         if (sitzungA != null)
             sitzungA.spielZuende();
         if (sitzungB != null)
@@ -174,7 +186,8 @@ public abstract class LaufendesSpiel {
         SITZUNG_B_ZUG,
         SITZUNG_A_GEWONNEN,
         SITZUNG_B_GEWONNEN,
-        UNENTSCHIEDEN
+        UNENTSCHIEDEN,
+        ABBRUCH
     }
 
     enum Spieler {

@@ -3,6 +3,8 @@ package uni.prakinf.m4.client.forms;
 import uni.prakinf.m4.client.Client;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -59,6 +61,12 @@ public class LobbyWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 client.onLobbyWindowLogout();
+            }
+        });
+        playerList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                client.setPrivateMessagePartner(playerList.getSelectedIndex());
             }
         });
     }

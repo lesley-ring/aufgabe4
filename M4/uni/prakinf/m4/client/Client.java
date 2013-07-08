@@ -20,6 +20,7 @@ public class Client implements IClient {
     private String myName;
     private String[] connected_names;
     private IClient.Spiel[] connected_games;
+    private String privateMessagePartner;
 
     public Client() {
         loginDialog = new LoginDialog(this);
@@ -45,6 +46,7 @@ public class Client implements IClient {
 
         clientState = ClientState.NONE;
         myName = "";
+        privateMessagePartner = "";
     }
 
     public static void main(String[] args) {
@@ -173,8 +175,20 @@ public class Client implements IClient {
         goToState(ClientState.NONE);
     }
 
+    public String getPrivateMessagePartner() {
+        return privateMessagePartner;
+    }
+
+    public void setPrivateMessagePartner(int index) {
+        if(index == -1)
+            privateMessagePartner = "";
+        else
+            privateMessagePartner = connected_names[index];
+
+    }
+
     public void onMessageLineEnter(String message) {
-        if (serverConnection.nachricht("", message)) {
+        if (serverConnection.nachricht(privateMessagePartner, message)) {
             lobbyWindow.addLineToMessagePane(String.format("[%12s] %s", myName, message));
         } else {
             lobbyWindow.addLineToMessagePane("Nachricht konnte nicht gesendet werden.");
@@ -253,6 +267,9 @@ public class Client implements IClient {
             }
             listItems[i] = s;
         }
+
+        setPrivateMessagePartner(-1);
+
         lobbyWindow.updatePlayerList(listItems);
 
         connected_names = name;

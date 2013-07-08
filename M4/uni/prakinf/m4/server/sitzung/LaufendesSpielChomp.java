@@ -82,6 +82,9 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
                     case UNENTSCHIEDEN:
                         client.neuerZustandChomp(IClient.Zustand.UNENTSCHIEDEN, spielfeld, getSpielerBName());
                         break;
+                    case ABBRUCH:
+                        client.neuerZustandChomp(IClient.Zustand.ABBRUCH, spielfeld, getSpielerBName());
+                        break;
                 }
                 break;
             case B:
@@ -103,6 +106,9 @@ public class LaufendesSpielChomp extends LaufendesSpiel {
                         break;
                     case WARTE_AUF_ZWEITE_SITZUNG:
                         Logger.errln("LaufendesSpielChomp: Ungültiger Zustand!");
+                        break;
+                    case ABBRUCH:
+                        client.neuerZustandChomp(IClient.Zustand.ABBRUCH, spielfeld, getSpielerAName());
                         break;
                     case WARTE_AUF_ANNAHME:
                         // Keine Nachricht!
