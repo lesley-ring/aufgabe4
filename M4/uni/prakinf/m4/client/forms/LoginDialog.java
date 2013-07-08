@@ -46,8 +46,13 @@ public class LoginDialog extends JFrame {
 
     public void resetEntries() {
         serverTextField.setText("localhost");
+<<<<<<< HEAD
         benutzernameTextField.setText("");
         passwortPasswordField.setText("");
+=======
+        benutzernameTextField.setText("fghj");
+        passwortPasswordField.setText("fjgh");
+>>>>>>> aba4577... Client hinzugefügt
         invalidate();
     }
 }
