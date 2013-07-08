@@ -22,10 +22,6 @@ public class Server implements M4Annahme {
         sitzungen = new LinkedList<Sitzung>();
     }
 
-    public static void main(String[] args) {
-        new Server().startServer();
-    }
-
     public void startServer() {
         Logger.logln("Server: Starte Server...");
         vthread = new VerbindungsThread(this);
@@ -206,6 +202,12 @@ public class Server implements M4Annahme {
                 }
             }
             Logger.logln("Server: Verbindungsthread beenden...");
+            try {
+                socket.close();
+                Logger.logln("Server: Beendet.");
+            } catch (Exception e) {
+                Logger.errf("Server: Konnte Socket nicht freigeben: %s\n", e.getMessage());
+            }
         }
 
         public void anhalten() {

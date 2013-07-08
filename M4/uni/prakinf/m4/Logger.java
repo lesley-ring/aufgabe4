@@ -1,58 +1,68 @@
 package uni.prakinf.m4;
 
+import javax.swing.*;
 import java.util.Date;
 
 public class Logger {
+    public static JTextPane tpane = null;
+
+    private static void addToLog(String s) {
+        if (tpane == null)
+            System.out.print(s);
+        else
+            tpane.setText(tpane.getText() + s);
+    }
+
     public static void tsl() {
-        System.out.print("[" + new Date().toString() + "] ");
+        addToLog(String.format("[" + new Date().toString() + ",INFO ] "));
     }
 
     public static void tse() {
-        System.err.print("[" + new Date().toString() + "] ");
+        addToLog(String.format("[" + new Date().toString() + ",ERROR] "));
     }
 
     public static void errln(String s) {
         tse();
-        System.err.println(s);
+        addToLog(s + "\n");
     }
 
     public static void errf(String s, String stringa) {
         tse();
-        System.err.printf(s, stringa);
+        addToLog(String.format(s, stringa));
     }
 
     public static void errf(String s, String stringa, String stringb) {
         tse();
-        System.err.printf(s, stringa, stringb);
+        addToLog(String.format(s, stringa, stringb));
     }
 
     public static void errf(String s, String stringa, String stringb, String stringc) {
         tse();
-        System.err.printf(s, stringa, stringb, stringc);
+        addToLog(String.format(s, stringa, stringb, stringc));
     }
 
     public static void logln(String s) {
         tsl();
-        System.out.println(s);
+        addToLog(s + "\n");
     }
 
     public static void logf(String s) {
         tsl();
-        System.out.printf(s);
+        addToLog(s);
     }
 
     public static void logf(String s, String strings) {
         tsl();
-        System.out.printf(s, strings);
+        addToLog(String.format(s, strings));
     }
 
     public static void logf(String s, String stringa, String stringb) {
         tsl();
-        System.out.printf(s, stringa, stringb);
+        addToLog(String.format(s, stringa, stringb));
     }
 
     public static void logf(String s, int val) {
         tsl();
-        System.out.printf(s, val);
+        addToLog(String.format(s, val));
     }
 }
