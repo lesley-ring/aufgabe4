@@ -16,7 +16,6 @@ public class LobbyWindow extends JFrame {
     private JPanel panel1;
     private JTextField messageTextField;
     private JButton mitspielenButton;
-    private JButton privateNachrichtButton;
     private JButton neuesSpielButton;
     private JList playerList;
     private JButton abmeldenButton;
