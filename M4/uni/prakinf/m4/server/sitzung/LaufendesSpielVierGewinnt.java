@@ -173,6 +173,9 @@ public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
                     case UNENTSCHIEDEN:
                         client.neuerZustandVierGewinnt(IClient.Zustand.UNENTSCHIEDEN, spielfeld_a, getSpielerBName());
                         break;
+                    case ABBRUCH:
+                        client.neuerZustandVierGewinnt(IClient.Zustand.ABBRUCH, spielfeld_a, getSpielerBName());
+                        break;
                 }
                 break;
             case B:
@@ -197,6 +200,9 @@ public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
                         break;
                     case WARTE_AUF_ANNAHME:
                         // Keine Nachricht!
+                        break;
+                    case ABBRUCH:
+                        client.neuerZustandVierGewinnt(IClient.Zustand.ABBRUCH, spielfeld_b, getSpielerAName());
                         break;
                 }
                 break;
