@@ -2,14 +2,15 @@ package uni.prakinf.m4.server.sitzung;
 
 import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
+import uni.prakinf.m4.server.Server;
 
 public class LaufendesSpielVierGewinnt extends LaufendesSpiel {
     private LaufendesSpiel.Spieler gewinner;
     private Spieler[][] spielfeld;
     private int sgx, sgy;
 
-    public LaufendesSpielVierGewinnt(Sitzung sitzungA, int x, int y) {
-        super(sitzungA);
+    public LaufendesSpielVierGewinnt(Sitzung sitzungA, Server server, int x, int y) {
+        super(sitzungA, server);
         gewinner = null;
         spielfeld = new Spieler[x][y];
         sgx = x;

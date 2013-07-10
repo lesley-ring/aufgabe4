@@ -97,25 +97,30 @@ public class Server implements M4Annahme {
     public void sitzungenVerteilen() {
         ArrayList<String> names = new ArrayList<String>();
         ArrayList<IClient.Spiel> games = new ArrayList<IClient.Spiel>();
+        ArrayList<Boolean> avails = new ArrayList<Boolean>();
         final ArrayList<Sitzung> sessions = new ArrayList<Sitzung>();
         synchronized (sitzungen) {
             for (Sitzung sitzung : sitzungen)
                 if (sitzung.getSitzungName() != null && !sitzung.getSitzungName().isEmpty()) {
                     names.add(sitzung.getSitzungName());
                     games.add(sitzung.getSpielTyp());
+                    avails.add(sitzung.wartet());
                     sessions.add(sitzung);
                 }
         }
 
         final String[] anames = names.toArray(new String[names.size()]);
         final IClient.Spiel[] agames = games.toArray(new IClient.Spiel[games.size()]);
+        final boolean[] aavails = new boolean[avails.size()];
+        for(int i = 0; i < avails.size(); i++)
+            aavails[i] = avails.get(i);
 
         new Thread() {
             public void run() {
                 // Logger.logf("Server: Verteile %d Sitzungen...\n", sessions.size());
                 for (Sitzung sitzung : sessions) {
                     try {
-                        sitzung.spielerListe(anames, agames);
+                        sitzung.spielerListe(anames, agames, aavails);
                     } catch (Exception e) {
                         Logger.errf("Server: Fehler bei Sitzungsverteilung: %s\n", e.getMessage());
                     }

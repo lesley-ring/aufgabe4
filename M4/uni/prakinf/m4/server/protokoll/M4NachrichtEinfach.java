@@ -11,24 +11,13 @@ public class M4NachrichtEinfach extends M4Nachricht implements Serializable {
     private int ia = 0, ib = 0;
     private IClient.Spiel spiel = IClient.Spiel.KEINS;
     private boolean b = false;
+    private boolean lb[] = null;
     private String ls[] = null;
     private IClient.Spiel lspiel[] = null;
     private Methode methode = Methode.NOT_SET;
 
     public M4NachrichtEinfach(Methode methode) {
         this.methode = methode;
-    }
-
-    public M4NachrichtEinfach(Methode methode, String sa, String sb, int ia, int ib, IClient.Spiel spiel, boolean b, String[] ls, IClient.Spiel[] lspiel) {
-        this.methode = methode;
-        this.sa = sa;
-        this.sb = sb;
-        this.ia = ia;
-        this.ib = ib;
-        this.spiel = spiel;
-        this.b = b;
-        this.ls = ls;
-        this.lspiel = lspiel;
     }
 
     public String getSa() {
@@ -77,6 +66,14 @@ public class M4NachrichtEinfach extends M4Nachricht implements Serializable {
 
     public void setB(boolean b) {
         this.b = b;
+    }
+
+    public boolean[] getLb() {
+        return lb;
+    }
+
+    public void setLb(boolean[] lb) {
+        this.lb = lb;
     }
 
     public String[] getLs() {

@@ -32,7 +32,7 @@ public class Spiele implements IClient, ActionListener {
         });
         frame.setBackground(Color.white);
         frame.setSize(400, 400);
-        spielerListe(names, spiels); // Es fehlt noch die Parameter, die von Server bekommen sollen.
+        //spielerListe(names, spiels); // Es fehlt noch die Parameter, die von Server bekommen sollen.
         frame.setVisible(true);
     }
 
@@ -114,7 +114,7 @@ public class Spiele implements IClient, ActionListener {
     }
 
     @Override
-    public void spielerListe(String[] name, Spiel[] spiel) {
+    public void spielerListe(String[] name, Spiel[] spiel, boolean[] verfuegbar) {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("SpielerListe");
         for (int i = 0; i < name.length; i++) {

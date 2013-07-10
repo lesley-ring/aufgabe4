@@ -1,5 +1,6 @@
 package uni.prakinf.m4.client.forms;
 
+import com.sun.deploy.util.ArrayUtil;
 import uni.prakinf.m4.client.Client;
 
 import javax.swing.*;
@@ -13,7 +14,6 @@ import java.util.Vector;
 
 public class LobbyWindow extends JFrame {
     private Client client;
-
     private JTextPane messagePane;
     private JPanel panel1;
     private JTextField messageTextField;
@@ -21,12 +21,13 @@ public class LobbyWindow extends JFrame {
     private JButton neuesSpielButton;
     private JList playerList;
     private JButton abmeldenButton;
+    private JLabel statusLabel;
 
     public LobbyWindow(Client client_) {
         this.client = client_;
 
         setContentPane(panel1);
-        setTitle("M4 Lobby");
+
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -53,7 +54,7 @@ public class LobbyWindow extends JFrame {
                 if (playerList.getSelectedValue() instanceof String) {
                     String s = (String) playerList.getSelectedValue();
                     if (!s.isEmpty())
-                        client.onJoinGame(playerList.getSelectedIndex());
+                        client.onJoinGame(playerList.getSelectedIndex() - 1);
                 }
             }
         });
@@ -66,7 +67,10 @@ public class LobbyWindow extends JFrame {
         playerList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                client.setPrivateMessagePartner(playerList.getSelectedIndex());
+                if (playerList.getSelectedIndex() > 0)
+                    client.setPrivateMessagePartner(playerList.getSelectedIndex() - 1);
+                else
+                    client.setPrivateMessagePartner(-1);
             }
         });
     }
@@ -78,6 +82,8 @@ public class LobbyWindow extends JFrame {
         messagePane.setText("Hallo!\n");
         messageTextField.setText("");
         messageTextField.requestFocus();
+        statusLabel.setText("");
+        setTitle("M4 Lobby");
     }
 
     public void addLineToMessagePane(String message) {
@@ -87,6 +93,32 @@ public class LobbyWindow extends JFrame {
 
     @SuppressWarnings("unchecked")
     public void updatePlayerList(String[] list) {
-        playerList.setListData(list);
+        String nlist[] = new String[list.length + 1];
+        nlist[0] = "An alle senden";
+        for(int i = 0; i < list.length; i++)
+            nlist[i+1] = list[i];
+
+        if (playerList.getSelectedIndex() > 0) {
+            String selName = (String) playerList.getSelectedValue();
+            playerList.setListData(nlist);
+            for (int i = 0; i < list.length; i++) {
+                if (list[i].equals(selName)) {
+                    playerList.setSelectedIndex(i+1);
+                    return;
+                }
+            }
+            playerList.setSelectedIndex(0);
+        } else {
+            playerList.setListData(nlist);
+            playerList.setSelectedIndex(0);
+        }
+    }
+
+    public void updateStatus(String status) {
+        statusLabel.setText(status);
+    }
+
+    public void updatePlayerName(String name) {
+        setTitle("M4 Lobby - " + name);
     }
 }

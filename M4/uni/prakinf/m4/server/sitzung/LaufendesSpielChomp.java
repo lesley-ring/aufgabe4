@@ -2,14 +2,15 @@ package uni.prakinf.m4.server.sitzung;
 
 import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
+import uni.prakinf.m4.server.Server;
 
 public class LaufendesSpielChomp extends LaufendesSpiel {
     private Spieler gewinner;
     private boolean[][] spielfeld;
     private int sgx, sgy;
 
-    public LaufendesSpielChomp(Sitzung sitzungA, int x, int y) {
-        super(sitzungA);
+    public LaufendesSpielChomp(Sitzung sitzungA, Server server, int x, int y) {
+        super(sitzungA, server);
         gewinner = null;
         spielfeld = new boolean[x][y];
         sgx = x;

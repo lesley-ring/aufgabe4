@@ -59,7 +59,7 @@ public class GameTester implements IClient {
     }
 
     @Override
-    public void spielerListe(String[] name, Spiel[] spiel) {
+    public void spielerListe(String[] name, Spiel[] spiel, boolean[] verfuegbar) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

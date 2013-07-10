@@ -9,7 +9,7 @@ public interface IClient {
 
     public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein spielfeld[][], String gegenspieler);
 
-    public void spielerListe(String[] name, Spiel[] spiel);
+    public void spielerListe(String[] name, Spiel[] spiel, boolean[] verfuegbar);
 
     public void nachricht(String name, String nachricht);
 

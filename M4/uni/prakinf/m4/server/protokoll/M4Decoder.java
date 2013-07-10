@@ -61,7 +61,7 @@ public class M4Decoder {
                 client.nachricht(nachrichtEinfach.getSa(), nachrichtEinfach.getSb());
                 break;
             case SRV_SPIELERLISTE:
-                client.spielerListe(nachrichtEinfach.getLs(), nachrichtEinfach.getLspiel());
+                client.spielerListe(nachrichtEinfach.getLs(), nachrichtEinfach.getLspiel(), nachrichtEinfach.getLb());
                 break;
             case SRV_SPIEL_ENDE:
                 client.spielZuende();

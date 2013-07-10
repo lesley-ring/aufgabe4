@@ -26,6 +26,13 @@ public class Sitzung implements IClient {
         spielTyp = Spiel.KEINS;
     }
 
+    public boolean wartet() {
+        if (spielTyp != Spiel.KEINS && spiel != null && spiel.zustand == LaufendesSpiel.Zustand.WARTE_AUF_ZWEITE_SITZUNG)
+            return true;
+        else
+            return false;
+    }
+
     public Spiel getSpielTyp() {
         return spielTyp;
     }
@@ -126,18 +133,18 @@ public class Sitzung implements IClient {
     }
 
     public void neuesSpiel(Spiel spielart, int x, int y) {
-        if (sitzungszustand != Sitzungszustand.ANGEMELDET || (x < 1) || (y < 1) || ((x*y) < 2) )
+        if (sitzungszustand != Sitzungszustand.ANGEMELDET || (x < 1) || (y < 1) || ((x * y) < 2))
             sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, false);
         switch (spielart) {
             case CHOMP:
-                spiel = new LaufendesSpielChomp(this, x, y);
+                spiel = new LaufendesSpielChomp(this, server, x, y);
                 sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, true);
                 sitzungszustand = Sitzungszustand.SPIELT;
                 spielTyp = Spiel.CHOMP;
                 spiel.los();
                 break;
             case VIER_GEWINNT:
-                spiel = new LaufendesSpielVierGewinnt(this, x, y);
+                spiel = new LaufendesSpielVierGewinnt(this, server, x, y);
                 sendeErgebnisAsync(M4NachrichtEinfach.Methode.RET_CL_NEUESSPIEL, true);
                 sitzungszustand = Sitzungszustand.SPIELT;
                 spielTyp = Spiel.VIER_GEWINNT;
@@ -191,10 +198,11 @@ public class Sitzung implements IClient {
     }
 
     @Override
-    public void spielerListe(String[] name, Spiel[] spiel) {
+    public void spielerListe(String[] name, Spiel[] spiel, boolean[] verfuegbar) {
         M4NachrichtEinfach liste_nr = new M4NachrichtEinfach(M4NachrichtEinfach.Methode.SRV_SPIELERLISTE);
         liste_nr.setLs(name);
         liste_nr.setLspiel(spiel);
+        liste_nr.setLb(verfuegbar);
         sendeNachrichtAsync(liste_nr);
     }
 

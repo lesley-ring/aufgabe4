@@ -60,6 +60,7 @@ public class Client implements IClient {
 
     /**
      * Wechsel von einem Sitzungszustand zum nächsten
+     *
      * @param targetState neuer Sitzungszustand
      */
     private synchronized void goToState(ClientState targetState) {
@@ -103,6 +104,7 @@ public class Client implements IClient {
             case SESSION_EST:
                 lobbyWindow.setVisible(true);
                 lobbyWindow.resetState();
+                lobbyWindow.updatePlayerName(myName);
                 break;
             case PLAYING_CHOMP:
             case PLAYING_C4:
@@ -122,6 +124,7 @@ public class Client implements IClient {
 
     /**
      * Zeigt eine modale Fehlermeldung an
+     *
      * @param msg Fehlernachricht
      */
     private void errorMsg(String msg) {
@@ -130,7 +133,8 @@ public class Client implements IClient {
 
     /**
      * Erzeugt eine menschenlesbare Nachricht aus einer Zustandsaufzählung
-     * @param enemy Name des Gegners
+     *
+     * @param enemy   Name des Gegners
      * @param zustand Zustand des Spiels
      * @return
      */
@@ -158,7 +162,8 @@ public class Client implements IClient {
 
     /**
      * Überprüft, ob der Spielzustand eine Anfrage darstellt und zeigt gegebenfalls ein modales Dialogfeld zur Abfrage.
-     * @param zustand Zustand des Spiels
+     *
+     * @param zustand      Zustand des Spiels
      * @param gegenspieler Name des Gegners
      */
     private void askForClearance(Zustand zustand, String gegenspieler) {
@@ -176,8 +181,9 @@ public class Client implements IClient {
 
     /**
      * Veranlasst die Anmeldung am Server
+     *
      * @param hostname Name des Servers
-     * @param name Benutzername
+     * @param name     Benutzername
      * @param password Passwort
      */
     public void onLoginDialogOKClick(String hostname, String name, String password) {
@@ -206,15 +212,14 @@ public class Client implements IClient {
         goToState(ClientState.NONE);
     }
 
-    public String getPrivateMessagePartner() {
-        return privateMessagePartner;
-    }
-
     public void setPrivateMessagePartner(int index) {
-        if(index == -1)
+        if (index == -1) {
             privateMessagePartner = "";
-        else
+            lobbyWindow.updateStatus("Nachricht wird an alle gesendet.");
+        } else {
             privateMessagePartner = connected_names[index];
+            lobbyWindow.updateStatus(String.format("Nachricht wird an %s gesendet.", privateMessagePartner));
+        }
 
     }
 
@@ -272,7 +277,6 @@ public class Client implements IClient {
         askForClearance(zustand, gegenspieler);
     }
 
-
     @Override
     public void neuerZustandVierGewinnt(Zustand zustand, VierGewinntStein[][] spielfeld, String gegenspieler) {
         goToState(ClientState.PLAYING_C4);
@@ -281,7 +285,7 @@ public class Client implements IClient {
     }
 
     @Override
-    public void spielerListe(String[] name, Spiel[] spiel) {
+    public void spielerListe(String[] name, Spiel[] spiel, boolean[] verfuegbar) {
         String[] listItems = new String[name.length];
         for (int i = 0; i < name.length; i++) {
             String s = name[i] + " ";
@@ -290,10 +294,10 @@ public class Client implements IClient {
                     s += "(kein Spiel)";
                     break;
                 case CHOMP:
-                    s += "(spielt gerade Chomp)";
+                    s += verfuegbar[i] ? "(möchte Chomp spielen)" : "(spielt gerade Chomp)";
                     break;
                 case VIER_GEWINNT:
-                    s += "(spielt gerade Vier Gewinnt)";
+                    s += verfuegbar[i] ? "(möchte Vier Gewinnt spielen)" : "(spielt gerade Vier Gewinnt)";
                     break;
             }
             listItems[i] = s;

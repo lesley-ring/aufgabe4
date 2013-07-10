@@ -2,16 +2,18 @@ package uni.prakinf.m4.server.sitzung;
 
 import uni.prakinf.m4.Logger;
 import uni.prakinf.m4.client.IClient;
+import uni.prakinf.m4.server.Server;
 import uni.prakinf.m4.server.protokoll.M4NachrichtEinfach;
 
 public abstract class LaufendesSpiel {
     private Sitzung sitzungA;
     private Sitzung sitzungB;
+    private Server server;
+    public Zustand zustand;
 
-    Zustand zustand;
-
-    LaufendesSpiel(Sitzung sitzungA) {
+    LaufendesSpiel(Sitzung sitzungA, Server server) {
         this.sitzungA = sitzungA;
+        this.server = server;
         this.sitzungB = null;
         zustand = Zustand.WARTE_AUF_ZWEITE_SITZUNG;
     }
@@ -58,9 +60,11 @@ public abstract class LaufendesSpiel {
             if (antwort) {
                 zustand = Zustand.SITZUNG_A_ZUG;
                 benachrichtigeAlle();
+                server.sitzungenVerteilen();
             } else {
                 sitzungB = null;
                 zustand = Zustand.WARTE_AUF_ZWEITE_SITZUNG;
+                server.sitzungenVerteilen();
                 los();
             }
 
