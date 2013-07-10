@@ -9,13 +9,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Client implements IClient {
+    // Zustand
     private ClientState clientState;
-    //
+    // Fenster
     private LoginDialog loginDialog;
     private LobbyWindow lobbyWindow;
     private NewGameDialog newGameDialog;
     private GameWindow gameWindow;
-    //
+    // Status
     private ServerConnection serverConnection;
     private String myName;
     private String[] connected_names;
@@ -57,11 +58,15 @@ public class Client implements IClient {
         goToState(ClientState.LOGIN);
     }
 
+    /**
+     * Wechsel von einem Sitzungszustand zum nächsten
+     * @param targetState neuer Sitzungszustand
+     */
     private synchronized void goToState(ClientState targetState) {
         if (targetState == clientState)
             return;
 
-        // destruction
+        // Abbau des alten Zustandes
         switch (clientState) {
             case SESSION_EST:
                 if (targetState == ClientState.LOGIN) {
@@ -89,7 +94,7 @@ public class Client implements IClient {
                 break;
         }
 
-        // construction
+        // Aufbau des neuen Zustandes
         switch (targetState) {
             case LOGIN:
                 loginDialog.setVisible(true);
@@ -113,11 +118,22 @@ public class Client implements IClient {
         clientState = targetState;
     }
 
-    // Utilities
+    // Hilfsfunktionen
+
+    /**
+     * Zeigt eine modale Fehlermeldung an
+     * @param msg Fehlernachricht
+     */
     private void errorMsg(String msg) {
         JOptionPane.showMessageDialog(null, msg, "Fehler!", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Erzeugt eine menschenlesbare Nachricht aus einer Zustandsaufzählung
+     * @param enemy Name des Gegners
+     * @param zustand Zustand des Spiels
+     * @return
+     */
     private String formatStatus(String enemy, Zustand zustand) {
         switch (zustand) {
             case KEIN_SPIELER:
@@ -140,6 +156,11 @@ public class Client implements IClient {
         return "";
     }
 
+    /**
+     * Überprüft, ob der Spielzustand eine Anfrage darstellt und zeigt gegebenfalls ein modales Dialogfeld zur Abfrage.
+     * @param zustand Zustand des Spiels
+     * @param gegenspieler Name des Gegners
+     */
     private void askForClearance(Zustand zustand, String gegenspieler) {
         if (zustand == Zustand.ANFRAGE) {
             int result = JOptionPane.showConfirmDialog(null, String.format("Darf %s mitspielen?", gegenspieler), "Anfrage", JOptionPane.YES_NO_OPTION);
@@ -152,6 +173,13 @@ public class Client implements IClient {
     }
 
     // LoginDialog
+
+    /**
+     * Veranlasst die Anmeldung am Server
+     * @param hostname Name des Servers
+     * @param name Benutzername
+     * @param password Passwort
+     */
     public void onLoginDialogOKClick(String hostname, String name, String password) {
         boolean result = serverConnection.login(hostname, name, password);
         if (result) {
@@ -162,6 +190,9 @@ public class Client implements IClient {
         }
     }
 
+    /**
+     * Wird bei Verlassen des Login-Dialoges aufgerufen
+     */
     public void onLoginDialogExit() {
         goToState(ClientState.NONE);
     }
